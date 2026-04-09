@@ -15,9 +15,9 @@ function getStats(text: string) {
 function getKeywordDensity(text: string): { word: string; count: number; pct: string }[] {
   if (!text.trim()) return [];
   const stopWords = new Set(["the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "is", "was", "are", "were", "be", "this", "that", "it", "by"]);
-  const words = text.toLowerCase().match(/\b[a-z]+\b/g) || [];
+  const matches: string[] = text.toLowerCase().match(/\b[a-z]+\b/g) ?? [];
   const freq: Record<string, number> = {};
-  words.forEach((w) => { if (!stopWords.has(w) && w.length > 2) freq[w] = (freq[w] || 0) + 1; });
+  matches.forEach((w: string) => { if (!stopWords.has(w) && w.length > 2) freq[w] = (freq[w] || 0) + 1; });
   const total = Object.values(freq).reduce((a, b) => a + b, 0);
   return Object.entries(freq)
     .sort(([, a], [, b]) => b - a)
