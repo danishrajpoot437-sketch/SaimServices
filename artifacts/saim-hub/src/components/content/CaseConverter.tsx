@@ -19,7 +19,7 @@ const transformations = [
   { label: "lowercase", fn: (s: string) => s.toLowerCase(), testId: "btn-lowercase" },
   { label: "Title Case", fn: toTitleCase, testId: "btn-titlecase" },
   { label: "Sentence case", fn: toSentenceCase, testId: "btn-sentencecase" },
-  { label: "Remove Spaces", fn: (s: string) => s.replace(/\s+/g, " ").trim(), testId: "btn-removespaces" },
+  { label: "Remove Spaces", fn: (s: string) => s.replace(/\s+/g, ""), testId: "btn-removespaces" },
   { label: "Remove Emojis", fn: removeEmojis, testId: "btn-removeemojis" },
 ];
 
