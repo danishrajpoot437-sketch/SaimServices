@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeftRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeftRight, ChevronDown, Search } from "lucide-react";
 
 type UnitCategory = "Length" | "Mass" | "Temperature" | "Speed" | "Pressure" | "Power";
 
@@ -60,6 +60,109 @@ const units: Record<UnitCategory, UnitDef[]> = {
 
 const categories = Object.keys(units) as UnitCategory[];
 
+function UnitDropdown({
+  options,
+  selectedIdx,
+  onSelect,
+  testId,
+}: {
+  options: UnitDef[];
+  selectedIdx: number;
+  onSelect: (idx: number) => void;
+  testId: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => searchRef.current?.focus(), 50);
+    } else {
+      setSearch("");
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filtered = options.filter((u) =>
+    u.label.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div ref={dropdownRef} className="relative" data-testid={testId}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between gap-2 bg-muted/60 text-foreground text-sm rounded-xl px-3 py-2.5 border border-white/10 hover:border-primary/40 focus:border-primary/50 outline-none transition-colors"
+        data-testid={`${testId}-trigger`}
+      >
+        <span className="truncate text-left">{options[selectedIdx]?.label}</span>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 top-full mt-1 left-0 right-0 rounded-xl border border-white/10 shadow-2xl overflow-hidden"
+            style={{ background: "rgba(16, 24, 48, 0.98)", backdropFilter: "blur(16px)" }}
+          >
+            <div className="p-2 border-b border-white/5">
+              <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
+                <Search className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search units..."
+                  className="w-full bg-transparent text-xs text-foreground placeholder:text-muted-foreground/60 outline-none"
+                  data-testid={`${testId}-search`}
+                />
+              </div>
+            </div>
+            <div className="max-h-48 overflow-y-auto py-1">
+              {filtered.length === 0 ? (
+                <div className="px-3 py-3 text-xs text-muted-foreground text-center">No units found</div>
+              ) : (
+                filtered.map((u) => {
+                  const idx = options.indexOf(u);
+                  return (
+                    <button
+                      key={u.label}
+                      onClick={() => { onSelect(idx); setOpen(false); }}
+                      className={`w-full text-left px-3 py-2 text-sm transition-colors ${
+                        idx === selectedIdx
+                          ? "text-primary bg-primary/10"
+                          : "text-foreground hover:bg-white/5"
+                      }`}
+                      data-testid={`${testId}-option-${idx}`}
+                    >
+                      {u.label}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function UnitConverter() {
   const [category, setCategory] = useState<UnitCategory>("Length");
   const [fromIdx, setFromIdx] = useState(0);
@@ -80,39 +183,32 @@ export default function UnitConverter() {
 
   return (
     <div>
-      {/* Category Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {categories.map((cat) => (
+        {categories.map((c) => (
           <button
-            key={cat}
-            onClick={() => { setCategory(cat); setFromIdx(0); setToIdx(1); setFromValue("1"); }}
+            key={c}
+            onClick={() => { setCategory(c); setFromIdx(0); setToIdx(1); setFromValue("1"); }}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-              category === cat
+              category === c
                 ? "bg-primary text-primary-foreground"
                 : "bg-white/5 text-muted-foreground hover:text-foreground hover:bg-white/10 border border-white/10"
             }`}
-            data-testid={`tab-unit-${cat.toLowerCase()}`}
+            data-testid={`tab-unit-${c.toLowerCase()}`}
           >
-            {cat}
+            {c}
           </button>
         ))}
       </div>
 
-      {/* Converter */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center">
-        {/* From */}
         <div className="glass-card rounded-2xl p-5 space-y-3">
           <label className="text-xs font-medium text-muted-foreground">From</label>
-          <select
-            value={fromIdx}
-            onChange={(e) => setFromIdx(Number(e.target.value))}
-            className="w-full bg-muted/60 text-foreground text-sm rounded-xl px-3 py-2.5 border border-white/10 focus:border-primary/50 outline-none transition-colors"
-            data-testid="select-unit-from"
-          >
-            {cat.map((u, i) => (
-              <option key={u.label} value={i} className="bg-[#16213e]">{u.label}</option>
-            ))}
-          </select>
+          <UnitDropdown
+            options={cat}
+            selectedIdx={fromIdx}
+            onSelect={setFromIdx}
+            testId="select-unit-from"
+          />
           <input
             type="number"
             value={fromValue}
@@ -123,7 +219,6 @@ export default function UnitConverter() {
           />
         </div>
 
-        {/* Swap */}
         <motion.button
           onClick={swap}
           whileHover={{ rotate: 180, scale: 1.1 }}
@@ -135,26 +230,20 @@ export default function UnitConverter() {
           <ArrowLeftRight className="w-4 h-4" />
         </motion.button>
 
-        {/* To */}
         <div className="glass-card rounded-2xl p-5 space-y-3">
           <label className="text-xs font-medium text-muted-foreground">To</label>
-          <select
-            value={toIdx}
-            onChange={(e) => setToIdx(Number(e.target.value))}
-            className="w-full bg-muted/60 text-foreground text-sm rounded-xl px-3 py-2.5 border border-white/10 focus:border-primary/50 outline-none transition-colors"
-            data-testid="select-unit-to"
-          >
-            {cat.map((u, i) => (
-              <option key={u.label} value={i} className="bg-[#16213e]">{u.label}</option>
-            ))}
-          </select>
+          <UnitDropdown
+            options={cat}
+            selectedIdx={toIdx}
+            onSelect={setToIdx}
+            testId="select-unit-to"
+          />
           <div className="text-3xl font-bold text-primary font-mono" data-testid="text-unit-result">
             {toDisplay}
           </div>
         </div>
       </div>
 
-      {/* Formula hint */}
       <div className="mt-4 p-3 rounded-xl bg-white/3 border border-white/5 text-xs text-muted-foreground font-mono">
         {fromValue || "0"} {cat[fromIdx].label} = {toDisplay} {cat[toIdx].label}
       </div>

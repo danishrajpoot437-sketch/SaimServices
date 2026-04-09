@@ -6,7 +6,7 @@ const navLinks = [
   { label: "Tools", href: "#tools-overview" },
   { label: "Engineering Suite", href: "#engineering-suite" },
   { label: "Academic Hub", href: "#academic-hub" },
-  { label: "Content Tools", href: "#content-powerhouse" },
+  { label: "Resources", href: "#content-powerhouse" },
   { label: "News", href: "#news-feed" },
   { label: "About", href: "#about" },
 ];
