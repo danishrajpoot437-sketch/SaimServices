@@ -14,7 +14,7 @@ const itemVariants: Variants = {
 
 export default function Footer() {
   return (
-    <footer id="about" className="relative overflow-hidden" style={{ background: "rgba(10, 14, 32, 0.95)" }}>
+    <footer className="relative overflow-hidden" style={{ background: "rgba(10, 14, 32, 0.95)" }}>
       {/* Top gradient border */}
       <div className="section-divider w-full" />
 
