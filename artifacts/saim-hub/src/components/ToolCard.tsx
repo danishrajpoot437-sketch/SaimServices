@@ -15,10 +15,31 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 const categoryColors: Record<string, string> = {
-  Engineering: "text-[#4361ee] bg-[#4361ee]/10 border-[#4361ee]/20",
-  Academic: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
-  Content: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-  News: "text-purple-400 bg-purple-400/10 border-purple-400/20",
+  Engineering: "text-[#4361ee] bg-[#4361ee]/10 border-[#4361ee]/25",
+  Academic: "text-emerald-400 bg-emerald-400/10 border-emerald-400/25",
+  Content: "text-amber-400 bg-amber-400/10 border-amber-400/25",
+  News: "text-purple-400 bg-purple-400/10 border-purple-400/25",
+};
+
+const categoryGlows: Record<string, string> = {
+  Engineering: "rgba(67,97,238,0.18)",
+  Academic: "rgba(52,211,153,0.15)",
+  Content: "rgba(251,191,36,0.15)",
+  News: "rgba(167,139,250,0.15)",
+};
+
+const categoryIconBg: Record<string, string> = {
+  Engineering: "bg-[#4361ee]/15 group-hover:bg-[#4361ee]/28",
+  Academic: "bg-emerald-400/12 group-hover:bg-emerald-400/25",
+  Content: "bg-amber-400/12 group-hover:bg-amber-400/25",
+  News: "bg-purple-400/12 group-hover:bg-purple-400/25",
+};
+
+const categoryIconColor: Record<string, string> = {
+  Engineering: "text-[#4361ee]",
+  Academic: "text-emerald-400",
+  Content: "text-amber-400",
+  News: "text-purple-400",
 };
 
 interface ToolCardProps {
@@ -33,6 +54,9 @@ interface ToolCardProps {
 
 export default function ToolCard({ id, name, category, description, icon, sectionId, index = 0 }: ToolCardProps) {
   const IconComp = iconMap[icon] || Calculator;
+  const glowColor = categoryGlows[category] || categoryGlows.Engineering;
+  const iconBg = categoryIconBg[category] || categoryIconBg.Engineering;
+  const iconColor = categoryIconColor[category] || categoryIconColor.Engineering;
 
   const handleClick = () => {
     const el = document.getElementById(sectionId);
@@ -41,27 +65,50 @@ export default function ToolCard({ id, name, category, description, icon, sectio
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
       onClick={handleClick}
-      className="glass-card rounded-2xl p-6 text-left group cursor-pointer tool-card-hover w-full"
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.99 }}
+      className="glass-card rounded-2xl p-6 text-left group cursor-pointer tool-card-hover w-full spotlight-card"
+      whileHover={{
+        scale: 1.025,
+        y: -4,
+        boxShadow: `0 0 0 1px rgba(255,255,255,0.06), 0 0 28px ${glowColor}, 0 16px 48px rgba(0,0,0,0.35)`,
+        transition: { type: "spring", stiffness: 350, damping: 22 },
+      }}
+      whileTap={{ scale: 0.985, transition: { duration: 0.1 } }}
       data-testid={`tool-card-${id}`}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center group-hover:bg-primary/25 transition-colors">
-          <IconComp className="w-5 h-5 text-primary" />
-        </div>
-        <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />
+        <motion.div
+          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${iconBg}`}
+          whileHover={{ rotate: [0, -5, 5, 0], transition: { duration: 0.4 } }}
+        >
+          <IconComp className={`w-5 h-5 ${iconColor}`} />
+        </motion.div>
+        <motion.div
+          className="w-6 h-6 flex items-center justify-center"
+          animate={{ x: 0, opacity: 0.4 }}
+          whileHover={{ x: 3, opacity: 1 }}
+        >
+          <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+        </motion.div>
       </div>
+
       <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md border mb-3 ${categoryColors[category] || categoryColors.Engineering}`}>
         {category}
       </span>
-      <h3 className="font-semibold text-foreground mb-2 text-sm leading-snug">{name}</h3>
-      <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
+      <h3 className="font-semibold text-foreground mb-2 text-sm leading-snug group-hover:text-white transition-colors duration-200">{name}</h3>
+      <p className="text-xs text-muted-foreground leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-200">{description}</p>
+
+      {/* Bottom shine line on hover */}
+      <motion.div
+        className="absolute bottom-0 left-4 right-4 h-px rounded-full"
+        style={{ background: `linear-gradient(90deg, transparent, ${glowColor.replace(')', ', 0.6)').replace('rgba', 'rgba')}, transparent)` }}
+        initial={{ opacity: 0, scaleX: 0 }}
+        whileHover={{ opacity: 1, scaleX: 1, transition: { duration: 0.3 } }}
+      />
     </motion.button>
   );
 }

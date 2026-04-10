@@ -204,69 +204,210 @@
   }
 }
 
-/* Glass card effect */
+/* ──────────────────────────────────────────
+   GLASS CARD — premium layered glass effect
+   ────────────────────────────────────────── */
 .glass-card {
-  background: rgba(15, 52, 96, 0.35);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 52, 96, 0.45) 0%,
+    rgba(22, 33, 62, 0.35) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .glass-navbar {
-  background: rgba(22, 33, 62, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(22, 33, 62, 0.80);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
-/* Blue glow effects */
+/* ──────────────────────────────────────────
+   GLOW EFFECTS
+   ────────────────────────────────────────── */
 .glow-blue {
-  box-shadow: 0 0 20px rgba(67, 97, 238, 0.3), 0 0 40px rgba(67, 97, 238, 0.1);
+  box-shadow:
+    0 0 12px rgba(67, 97, 238, 0.5),
+    0 0 32px rgba(67, 97, 238, 0.2),
+    0 0 60px rgba(67, 97, 238, 0.08);
 }
 
 .glow-gold {
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.1);
+  box-shadow:
+    0 0 12px rgba(251, 191, 36, 0.4),
+    0 0 32px rgba(251, 191, 36, 0.15);
 }
 
-/* Gradient text */
+.glow-emerald {
+  box-shadow:
+    0 0 12px rgba(52, 211, 153, 0.4),
+    0 0 32px rgba(52, 211, 153, 0.15);
+}
+
+/* ──────────────────────────────────────────
+   GRADIENT TEXT
+   ────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #4361ee, #0ea5e9, #fbbf24);
+  background: linear-gradient(135deg, #4361ee 0%, #0ea5e9 50%, #fbbf24 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-blue {
-  background: linear-gradient(135deg, #4361ee, #0ea5e9);
+  background: linear-gradient(135deg, #4361ee 0%, #0ea5e9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Section background patterns */
+/* ──────────────────────────────────────────
+   SECTION BACKGROUNDS
+   ────────────────────────────────────────── */
 .section-bg {
-  background: linear-gradient(180deg, hsl(231, 44%, 8%) 0%, hsl(228, 38%, 10%) 100%);
+  background: linear-gradient(
+    180deg,
+    hsl(231, 44%, 8%) 0%,
+    hsl(228, 42%, 9.5%) 50%,
+    hsl(231, 44%, 8%) 100%
+  );
+  position: relative;
 }
 
-/* Hover card effect */
+.section-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 40% at 50% 0%,
+    rgba(67, 97, 238, 0.04) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────────
+   SECTION SEPARATOR
+   ────────────────────────────────────────── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(67, 97, 238, 0.3) 30%,
+    rgba(14, 165, 233, 0.4) 50%,
+    rgba(67, 97, 238, 0.3) 70%,
+    transparent 100%
+  );
+  margin: 0 auto;
+}
+
+/* ──────────────────────────────────────────
+   TOOL CARD HOVER — premium version
+   ────────────────────────────────────────── */
 .tool-card-hover {
-  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-.tool-card-hover:hover {
-  border-color: rgba(67, 97, 238, 0.5);
-  box-shadow: 0 0 24px rgba(67, 97, 238, 0.15), 0 8px 32px rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Scrollbar */
+.tool-card-hover:hover {
+  border-color: rgba(67, 97, 238, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(67, 97, 238, 0.12),
+    0 0 20px rgba(67, 97, 238, 0.18),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  transform: translateY(-3px);
+}
+
+/* ──────────────────────────────────────────
+   BADGE / LABEL GLOW
+   ────────────────────────────────────────── */
+.badge-glow {
+  box-shadow: 0 0 8px rgba(67, 97, 238, 0.35);
+}
+
+/* ──────────────────────────────────────────
+   SHIMMER ANIMATION
+   ────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #4361ee 0%,
+    #0ea5e9 25%,
+    #fbbf24 50%,
+    #0ea5e9 75%,
+    #4361ee 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ──────────────────────────────────────────
+   FLOATING ANIMATION
+   ────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ──────────────────────────────────────────
+   SPOTLIGHT CARD (pointer-tracked glow)
+   ────────────────────────────────────────── */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, rgba(67,97,238,0.12), transparent 60%);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* ──────────────────────────────────────────
+   SCROLLBAR
+   ────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(231, 44%, 8%);
+  background: hsl(231, 44%, 6%);
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(231, 25%, 25%);
+  background: hsl(231, 25%, 22%);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
