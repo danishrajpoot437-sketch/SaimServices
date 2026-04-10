@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
@@ -34,9 +35,11 @@ interface NewsCardProps extends NewsItem {
 
 export default function NewsCard({ id, category, title, summary, date, source, image, url, index = 0 }: NewsCardProps) {
   const glowColor = categoryGlows[category] || categoryGlows.Tech;
+  const cardRef = useRef<HTMLElement>(null);
 
   return (
     <motion.article
+      ref={cardRef}
       variants={cardVariants}
       whileHover={{
         y: -6,
@@ -44,13 +47,15 @@ export default function NewsCard({ id, category, title, summary, date, source, i
       }}
       className="glass-card rounded-2xl overflow-hidden group flex flex-col"
       style={{ transition: "border-color 0.25s ease, box-shadow 0.25s ease" }}
-      onHoverStart={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = `rgba(255,255,255,0.14)`;
-        (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 1px rgba(255,255,255,0.06), 0 0 28px ${glowColor}, 0 20px 60px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.07) inset`;
+      onHoverStart={() => {
+        if (!cardRef.current) return;
+        cardRef.current.style.borderColor = `rgba(255,255,255,0.14)`;
+        cardRef.current.style.boxShadow = `0 0 0 1px rgba(255,255,255,0.06), 0 0 28px ${glowColor}, 0 20px 60px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.07) inset`;
       }}
-      onHoverEnd={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = '';
-        (e.currentTarget as HTMLElement).style.boxShadow = '';
+      onHoverEnd={() => {
+        if (!cardRef.current) return;
+        cardRef.current.style.borderColor = '';
+        cardRef.current.style.boxShadow = '';
       }}
       data-testid={`news-card-${id}`}
     >
