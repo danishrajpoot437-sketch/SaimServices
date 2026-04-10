@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, BookOpen, Hash, Building2 } from "lucide-react";
+import { GraduationCap, BookOpen, Calculator, Building2 } from "lucide-react";
 import StudyGuides from "./StudyGuides";
-import CGPAConverter from "./CGPAConverter";
+import GPAConverter from "./GPAConverter";
 import UniversityTracker from "./UniversityTracker";
+import ResourceCenter from "./ResourceCenter";
 
-type Tool = "study" | "cgpa" | "tracker";
+type Tool = "study" | "gpa" | "tracker";
 
 const tools: { id: Tool; label: string; icon: React.ComponentType<{ className?: string }>; description: string }[] = [
-  { id: "study", label: "Study Guides", icon: BookOpen, description: "USA, Europe, Scholarships, Visa" },
-  { id: "cgpa", label: "CGPA Converter", icon: Hash, description: "Multi-system grade conversion" },
-  { id: "tracker", label: "University Tracker", icon: Building2, description: "Application management" },
+  { id: "study",   label: "Study Guides",  icon: BookOpen,    description: "USA & UK · Scholarships · Deadlines" },
+  { id: "gpa",     label: "GPA Converter", icon: Calculator,  description: "USA 4.0 · UK Honours system" },
+  { id: "tracker", label: "Uni Tracker",   icon: Building2,   description: "Application management" },
 ];
 
 export default function AcademicHub() {
@@ -19,25 +20,29 @@ export default function AcademicHub() {
   return (
     <section id="academic-hub" className="py-28 px-4 sm:px-6 lg:px-8 section-bg relative overflow-hidden">
       {/* Ambient glow */}
-      <div className="absolute -right-64 top-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(52,211,153,0.05) 0%, transparent 70%)" }}
+      <div className="absolute -right-64 top-1/3 w-[560px] h-[560px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(16,185,129,0.055) 0%, transparent 70%)" }}
+      />
+      <div className="absolute -left-48 bottom-0 w-[400px] h-[400px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(52,211,153,0.03) 0%, transparent 70%)" }}
       />
 
       <div className="max-w-7xl mx-auto relative">
-        {/* Header */}
+        {/* ── Section Header ── */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-14"
+          className="mb-12"
         >
           <div className="flex items-center gap-4 mb-5">
             <motion.div
               whileInView={{ scale: [0.8, 1.1, 1] }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center glow-emerald"
+              className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center"
+              style={{ boxShadow: "0 0 20px rgba(16,185,129,0.25)" }}
             >
               <GraduationCap className="w-5 h-5 text-emerald-400" />
             </motion.div>
@@ -49,7 +54,7 @@ export default function AcademicHub() {
                 transition={{ duration: 0.4, delay: 0.15 }}
                 className="text-xs font-semibold text-emerald-400 tracking-[0.2em] uppercase block mb-0.5"
               >
-                Academic Hub
+                Academic Hub · USA & UK Focused
               </motion.span>
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-display">
                 Your Academic{" "}
@@ -60,20 +65,21 @@ export default function AcademicHub() {
             </div>
           </div>
           <p className="text-muted-foreground max-w-xl ml-[60px] leading-relaxed">
-            Everything you need for international academic success — from study guides to application tracking.
+            Precision tools for US & UK academic success — GPA conversion, study guides, scholarships,
+            deadlines, and official application portals, all in one place.
           </p>
           <div className="w-48 h-px mt-6 ml-[60px] rounded-full"
-            style={{ background: "linear-gradient(90deg, rgba(52,211,153,0.5), rgba(16,185,129,0.2), transparent)" }}
+            style={{ background: "linear-gradient(90deg, rgba(16,185,129,0.5), rgba(52,211,153,0.2), transparent)" }}
           />
         </motion.div>
 
-        {/* Tool Selector */}
+        {/* ── Tool Selector ── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5"
         >
           {tools.map((tool, i) => (
             <motion.button
@@ -97,8 +103,8 @@ export default function AcademicHub() {
                   layoutId="academic-active-bg"
                   className="absolute inset-0 rounded-2xl"
                   style={{
-                    background: "linear-gradient(135deg, rgba(52,211,153,0.14) 0%, rgba(16,185,129,0.06) 100%)",
-                    boxShadow: "0 0 20px rgba(52,211,153,0.12) inset",
+                    background: "linear-gradient(135deg, rgba(16,185,129,0.14) 0%, rgba(52,211,153,0.06) 100%)",
+                    boxShadow: "0 0 20px rgba(16,185,129,0.1) inset",
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
@@ -106,19 +112,23 @@ export default function AcademicHub() {
               <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
                 activeTool === tool.id ? "bg-emerald-500/25" : "bg-white/5"
               }`}>
-                <tool.icon className={`w-4 h-4 transition-colors duration-200 ${activeTool === tool.id ? "text-emerald-400" : "text-muted-foreground"}`} />
+                <tool.icon className={`w-4 h-4 transition-colors duration-200 ${
+                  activeTool === tool.id ? "text-emerald-400" : "text-muted-foreground"
+                }`} />
               </div>
               <div className="relative">
-                <div className={`text-sm font-semibold transition-colors duration-200 ${activeTool === tool.id ? "text-foreground" : "text-muted-foreground"}`}>
+                <div className={`text-sm font-semibold transition-colors duration-200 ${
+                  activeTool === tool.id ? "text-foreground" : "text-muted-foreground"
+                }`}>
                   {tool.label}
                 </div>
-                <div className="text-xs text-muted-foreground">{tool.description}</div>
+                <div className="text-xs text-muted-foreground/70">{tool.description}</div>
               </div>
             </motion.button>
           ))}
         </motion.div>
 
-        {/* Tool Content */}
+        {/* ── Tool Content Panel ── */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTool}
@@ -129,11 +139,14 @@ export default function AcademicHub() {
             className="glass-card rounded-3xl p-6 sm:p-8"
             style={{ boxShadow: "0 2px 0 rgba(255,255,255,0.05) inset, 0 20px 60px rgba(0,0,0,0.25)" }}
           >
-            {activeTool === "study" && <StudyGuides />}
-            {activeTool === "cgpa" && <CGPAConverter />}
+            {activeTool === "study"   && <StudyGuides />}
+            {activeTool === "gpa"     && <GPAConverter />}
             {activeTool === "tracker" && <UniversityTracker />}
           </motion.div>
         </AnimatePresence>
+
+        {/* ── Official Resource Center (always visible below) ── */}
+        <ResourceCenter />
       </div>
     </section>
   );
