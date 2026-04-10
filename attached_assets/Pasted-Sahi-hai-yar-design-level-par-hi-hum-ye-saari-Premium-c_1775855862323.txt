@@ -1,0 +1,48 @@
+Sahi hai yar, design level par hi hum ye saari "Premium" cheezein fit kar dete hain taake baad mein jab tum hosting par publish karo, toh website pehle din se hi "International" lage.
+
+Main ne converter ki logic aur resource links ko bilkul Western standards (US/UK) ke mutabiq set kar diya hai. Is combined prompt ko Replit AI ko do, ye tumhare Academic Hub ko poora kar dega:
+
+Final Academic Hub Prompt (US/UK Focused)
+*"I am building the Academic Hub section for my premium site. It must be specifically tailored for US and UK audiences.
+
+1. Dual-System GPA Converter (Logic & Design):
+
+Build a converter that allows users to toggle between 'Target: USA' and 'Target: UK'.
+
+USA Mode: Convert any international score into a 4.0 GPA scale.
+
+UK Mode: Convert scores into the UK Honours System (1st Class, 2:1, 2:2, 3rd Class).
+
+Design: Use a minimalist slider or input field with a 'Trust Badge' that says: 'Calculated using official US/UK conversion standards'.
+
+2. Academic Resource Center (Official Links):
+
+Below the main tools, add a dedicated 'Official Resources' footer or grid.
+
+It must include high-quality, glowing cards for:
+
+USA: 'Common App' (Undergraduate), 'FAFSA' (Aid), and 'ETS' (GRE/TOEFL).
+
+UK: 'UCAS' (Application Portal), 'GOV.UK' (Student Visa), and 'British Council' (IELTS).
+
+Feature: Each link should have a 'Verified External Link' icon next to it.
+
+3. USA/UK Study Guides:
+
+Create 4 cards with premium icons:
+
+USA Guide: Topics like Ivy League, F1 Visa, and SAT/ACT.
+
+UK Guide: Topics like Russell Group, Student Route Visa, and Personal Statements.
+
+Scholarship Finder: Focused on Full-ride scholarships for international students.
+
+Application Deadlines: A countdown or list showing typical Fall/Spring intake months for both countries.
+
+4. Design Instructions:
+
+Use Emerald Green (#10b981) as the primary accent color for this hub.
+
+Keep the glassmorphism theme with a blur effect on cards.
+
+Ensure all elements are mobile-responsive and the transitions between US/UK modes are handled smoothly with Framer Motion."
