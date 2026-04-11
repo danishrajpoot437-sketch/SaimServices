@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn } from "lucide-react";
+import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search } from "lucide-react";
 import AuthModal from "./AuthModal";
 
 interface DropdownItem {
@@ -19,8 +19,10 @@ const dropdownMenus: Record<string, DropdownItem[]> = {
     { label: "Eng. Constants", description: "12 click-to-copy physical constants", icon: BookOpenCheck, href: "#engineering-suite" },
   ],
   "Academic Hub": [
-    { label: "GPA Converter", description: "USA 4.0 ↔ UK Honours dual system", icon: GraduationCap, href: "#academic-hub" },
     { label: "Study Guides", description: "USA & UK guides, scholarships, deadlines", icon: Library, href: "#academic-hub" },
+    { label: "GPA Converter", description: "USA 4.0 ↔ UK Honours dual system", icon: GraduationCap, href: "#academic-hub" },
+    { label: "Citation Generator", description: "APA · MLA · Harvard · Chicago · Vancouver — free", icon: Quote, href: "#academic-hub" },
+    { label: "Research Finder", description: "Search arXiv, PubMed & Semantic Scholar papers", icon: Search, href: "#academic-hub" },
     { label: "Resource Center", description: "Common App, FAFSA, UCAS & more", icon: BookOpenCheck, href: "#academic-hub" },
   ],
   "Resources": [

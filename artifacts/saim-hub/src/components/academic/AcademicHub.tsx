@@ -1,14 +1,15 @@
 import { useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, BookOpen, Calculator, Building2, Quote } from "lucide-react";
+import { GraduationCap, BookOpen, Calculator, Building2, Quote, Search } from "lucide-react";
 import StudyGuides from "./StudyGuides";
 import GPAConverter from "./GPAConverter";
 import UniversityTracker from "./UniversityTracker";
 import ResourceCenter from "./ResourceCenter";
 
 const CitationGenerator = lazy(() => import("./CitationGenerator"));
+const ResearchFinder = lazy(() => import("./ResearchFinder"));
 
-type Tool = "study" | "gpa" | "tracker" | "citations";
+type Tool = "study" | "gpa" | "tracker" | "citations" | "research";
 
 const tools: {
   id: Tool;
@@ -21,7 +22,16 @@ const tools: {
   { id: "gpa",       label: "GPA Converter", icon: Calculator,   description: "USA 4.0 · UK Honours system" },
   { id: "tracker",   label: "Uni Tracker",   icon: Building2,    description: "Application management" },
   { id: "citations", label: "Citations",     icon: Quote,        description: "APA · MLA · Harvard · Chicago · Vancouver", isNew: true },
+  { id: "research",  label: "Research",      icon: Search,       description: "arXiv · PubMed · 200M+ papers", isNew: true },
 ];
+
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center py-16">
+      <div className="w-6 h-6 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin" />
+    </div>
+  );
+}
 
 export default function AcademicHub() {
   const [activeTool, setActiveTool] = useState<Tool>("study");
@@ -75,7 +85,7 @@ export default function AcademicHub() {
           </div>
           <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
             Precision tools for US & UK academic success — GPA conversion, study guides, scholarships,
-            deadlines, application portals, and a free citation generator for all major styles.
+            free citation generator, and a 200M+ paper research search engine.
           </p>
           <div className="w-48 h-px mt-6 mx-auto rounded-full"
             style={{ background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.5), rgba(52,211,153,0.2), transparent)" }}
@@ -90,7 +100,7 @@ export default function AcademicHub() {
           transition={{ duration: 0.5, delay: 0.15 }}
           className="overflow-x-auto pb-1 -mx-1 px-1 mb-5"
         >
-          <div className="flex gap-2 min-w-max sm:min-w-0 sm:grid sm:grid-cols-4">
+          <div className="flex gap-2 min-w-max sm:min-w-0 sm:grid sm:grid-cols-5">
             {tools.map((tool, i) => (
               <motion.button
                 key={tool.id}
@@ -98,10 +108,10 @@ export default function AcademicHub() {
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.07 }}
                 whileHover={{ y: -2, transition: { type: "spring", stiffness: 400, damping: 20 } }}
                 whileTap={{ scale: 0.97 }}
-                className={`relative flex items-center gap-3 p-4 rounded-2xl border transition-colors duration-200 text-left overflow-hidden ${
+                className={`relative flex items-center gap-2.5 p-3.5 rounded-2xl border transition-colors duration-200 text-left overflow-hidden ${
                   activeTool === tool.id
                     ? "border-emerald-500/40"
                     : "glass-card hover:border-emerald-500/20"
@@ -119,25 +129,25 @@ export default function AcademicHub() {
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-                <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                <div className={`relative w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
                   activeTool === tool.id ? "bg-emerald-500/25" : "bg-white/5"
                 }`}>
-                  <tool.icon className={`w-4 h-4 transition-colors duration-200 ${
+                  <tool.icon className={`w-3.5 h-3.5 transition-colors duration-200 ${
                     activeTool === tool.id ? "text-emerald-400" : "text-muted-foreground"
                   }`} />
                 </div>
                 <div className="relative min-w-0 flex-1">
-                  <div className={`text-sm font-semibold transition-colors duration-200 flex items-center gap-1.5 ${
+                  <div className={`text-xs font-semibold transition-colors duration-200 flex items-center gap-1 ${
                     activeTool === tool.id ? "text-foreground" : "text-muted-foreground"
                   }`}>
                     {tool.label}
                     {tool.isNew && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                      <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
                         style={{ background: "rgba(16,185,129,0.2)", color: "#4ade80", border: "1px solid rgba(16,185,129,0.3)" }}
                       >NEW</span>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground/70 leading-tight mt-0.5">{tool.description}</div>
+                  <div className="text-[10px] text-muted-foreground/60 leading-tight mt-0.5 truncate">{tool.description}</div>
                 </div>
               </motion.button>
             ))}
@@ -159,12 +169,13 @@ export default function AcademicHub() {
             {activeTool === "gpa"       && <GPAConverter />}
             {activeTool === "tracker"   && <UniversityTracker />}
             {activeTool === "citations" && (
-              <Suspense fallback={
-                <div className="flex items-center justify-center py-16">
-                  <div className="w-6 h-6 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin" />
-                </div>
-              }>
+              <Suspense fallback={<LoadingSpinner />}>
                 <CitationGenerator />
+              </Suspense>
+            )}
+            {activeTool === "research" && (
+              <Suspense fallback={<LoadingSpinner />}>
+                <ResearchFinder />
               </Suspense>
             )}
           </motion.div>
