@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Quote, Copy, Check, Download, Plus, Trash2,
-  Globe, BookOpen, FileText, Youtube, Clock, X,
+  Globe, BookOpen, FileText, Youtube, Clock, X, Loader2, Wand2,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -77,7 +77,8 @@ function formatAuthorsHarvard(authors: Author[]): string {
   if (!authors.length) return "";
   const fmt = (a: Author) => `${a.last.trim()}, ${initials(a.first)}`;
   if (authors.length === 1) return fmt(authors[0]);
-  if (authors.length <= 3) return authors.slice(0,-1).map(fmt).join(", ") + " and " + fmt(authors[authors.length-1]);
+  if (authors.length === 2) return `${fmt(authors[0])} and ${fmt(authors[1])}`;
+  if (authors.length === 3) return `${fmt(authors[0])}, ${fmt(authors[1])} and ${fmt(authors[2])}`;
   return fmt(authors[0]) + " et al.";
 }
 
@@ -86,9 +87,11 @@ function formatAuthorsChicago(authors: Author[]): string {
   const first = authors[0];
   const firstFmt = `${first.last.trim()}, ${first.first.trim()}`;
   if (authors.length === 1) return firstFmt;
+  if (authors.length > 3) return firstFmt + ", et al.";
   const rest = authors.slice(1).map(a => `${a.first.trim()} ${a.last.trim()}`);
-  if (authors.length <= 3) return firstFmt + ", and " + rest.join(", and ");
-  return firstFmt + ", et al.";
+  if (authors.length === 2) return `${firstFmt}, and ${rest[0]}`;
+  // exactly 3 authors
+  return `${firstFmt}, ${rest[0]}, and ${rest[1]}`;
 }
 
 function formatAuthorsVancouver(authors: Author[]): string {
@@ -98,9 +101,17 @@ function formatAuthorsVancouver(authors: Author[]): string {
   return authors.slice(0, 6).map(fmt).join(", ") + ", et al.";
 }
 
+// Segment helpers
 function seg(text: string, italic = false): CitationSegment { return { text, italic }; }
-function plain(segs: CitationSegment[]): string { return segs.map(s => s.text).join(""); }
-function buildResult(segs: CitationSegment[]): CitationResult { return { segments: segs, plain: plain(segs) }; }
+
+/** Plain text: italic segments wrapped in *asterisks* per style guide requirement */
+function toPlain(segs: CitationSegment[]): string {
+  return segs.map(s => s.italic ? `*${s.text}*` : s.text).join("");
+}
+
+function buildResult(segs: CitationSegment[]): CitationResult {
+  return { segments: segs, plain: toPlain(segs) };
+}
 
 // Month helpers
 function fullMonth(m: string): string { const i = parseInt(m); return (!isNaN(i) && i >= 1 && i <= 12) ? MONTHS_FULL[i-1] : m; }
@@ -141,17 +152,20 @@ function formatAPA7(src: CitationSource): CitationResult {
       const dateStr = (src.publishDay || src.publishMonth)
         ? `, ${src.publishMonth ? fullMonth(src.publishMonth) : ""} ${src.publishDay || ""}`.trim()
         : "";
+      const authorPart = authStr ? authStr + " " : (src.siteName ? src.siteName + ". " : "");
       return buildResult([
-        seg(authStr ? authStr + " " : (src.siteName ? src.siteName + ". " : "")),
+        seg(authorPart),
         seg(`(${year}${dateStr}). `),
         seg(src.title || "Page title", true),
         seg(". "),
-        seg(src.siteName && authStr ? src.siteName + ". " : ""),
+        seg(authStr && src.siteName ? src.siteName + ". " : ""),
         seg(src.url || "URL"),
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length ? formatAuthorsAPA(src.authors) : src.channelName || "Creator";
+      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
+        ? formatAuthorsAPA(src.authors)
+        : (src.channelName || "Creator");
       const dateStr = (src.videoDay || src.videoMonth)
         ? `, ${src.videoMonth ? fullMonth(src.videoMonth) : ""} ${src.videoDay || ""}`.trim()
         : "";
@@ -190,9 +204,8 @@ function formatMLA9(src: CitationSource): CitationResult {
       ]);
     }
     case "website": {
-      const dateStr = (src.publishDay || src.publishMonth)
-        ? `${src.publishDay || ""} ${src.publishMonth ? fullMonth(src.publishMonth) : ""} ${src.year || ""}`.trim()
-        : src.year || "";
+      const dateStr = [src.publishDay, src.publishMonth ? fullMonth(src.publishMonth) : "", src.year]
+        .filter(Boolean).join(" ").trim() || src.year || "n.d.";
       return buildResult([
         seg(authStr ? authStr + ". " : ""),
         seg(`"${src.title || "Page Title"}." `),
@@ -203,8 +216,11 @@ function formatMLA9(src: CitationSource): CitationResult {
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length ? formatAuthorsMLA(src.authors) : (src.channelName || "Creator");
-      const dateStr = `${src.videoDay || ""} ${src.videoMonth ? fullMonth(src.videoMonth) : ""} ${src.year || ""}`.trim();
+      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
+        ? formatAuthorsMLA(src.authors)
+        : (src.channelName || "Creator");
+      const dateStr = [src.videoDay, src.videoMonth ? fullMonth(src.videoMonth) : "", src.year]
+        .filter(Boolean).join(" ").trim() || src.year || "n.d.";
       return buildResult([
         seg(creator ? creator + ". " : ""),
         seg(`"${src.title || "Video Title"}." `),
@@ -253,13 +269,15 @@ function formatHarvard(src: CitationSource): CitationResult {
         seg(authStr ? authStr + " " : (src.siteName ? src.siteName + " " : "")),
         seg(`(${year}) `),
         seg(src.title || "Title of page", true),
-        seg(`, ${src.siteName && authStr ? src.siteName + ". " : ""}Available at: `),
+        seg(`. ${authStr && src.siteName ? src.siteName + ". " : ""}Available at: `),
         seg(src.url || "URL"),
         seg(` ${accDate}.`),
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length ? formatAuthorsHarvard(src.authors) : (src.channelName || "Creator");
+      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
+        ? formatAuthorsHarvard(src.authors)
+        : (src.channelName || "Creator");
       const accDate = src.accessDay && src.accessMonth && src.accessYear
         ? ` (Accessed: ${src.accessDay} ${fullMonth(src.accessMonth)} ${src.accessYear})`
         : "";
@@ -300,9 +318,8 @@ function formatChicago17(src: CitationSource): CitationResult {
       ]);
     }
     case "website": {
-      const dateStr = (src.publishDay || src.publishMonth)
-        ? `${fullMonth(src.publishMonth || "")} ${src.publishDay || ""}, ${src.year || ""}`.trim()
-        : src.year || "";
+      const dateStr = [fullMonth(src.publishMonth || ""), src.publishDay, src.year]
+        .filter(Boolean).join(" ").trim() || src.year || "n.d.";
       return buildResult([
         seg(authStr ? authStr + ". " : ""),
         seg(`"${src.title || "Page Title"}." `),
@@ -313,10 +330,11 @@ function formatChicago17(src: CitationSource): CitationResult {
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length ? formatAuthorsChicago(src.authors) : (src.channelName || "Creator");
-      const dateStr = (src.videoDay || src.videoMonth)
-        ? `${fullMonth(src.videoMonth || "")} ${src.videoDay || ""}, ${src.year || ""}`.trim()
-        : src.year || "";
+      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
+        ? formatAuthorsChicago(src.authors)
+        : (src.channelName || "Creator");
+      const dateStr = [fullMonth(src.videoMonth || ""), src.videoDay, src.year]
+        .filter(Boolean).join(" ").trim() || src.year || "n.d.";
       return buildResult([
         seg(creator ? creator + ". " : ""),
         seg(`"${src.title || "Video Title"}." YouTube video. `),
@@ -357,15 +375,18 @@ function formatVancouver(src: CitationSource): CitationResult {
       const accDate = src.accessYear
         ? `[cited ${src.accessYear} ${shortMonth(src.accessMonth || "")} ${src.accessDay || ""}]`.trim()
         : "[cited Date]";
+      const sitePartial = authStr && src.siteName ? src.siteName + "; " : "";
       return buildResult([
         seg(authStr ? authStr + ". " : (src.siteName ? src.siteName + ". " : "")),
         seg(src.title || "Title of page"),
-        seg(` [Internet]. ${src.siteName && authStr ? src.siteName + "; " : ""}${src.year || "Year"} ${accDate}. Available from: `),
+        seg(` [Internet]. ${sitePartial}${src.year || "Year"} ${accDate}. Available from: `),
         seg(src.url || "URL"),
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length ? formatAuthorsVancouver(src.authors) : (src.channelName || "Creator");
+      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
+        ? formatAuthorsVancouver(src.authors)
+        : (src.channelName || "Creator");
       const accDate = src.accessYear
         ? `[cited ${src.accessYear} ${shortMonth(src.accessMonth || "")} ${src.accessDay || ""}]`.trim()
         : "";
@@ -389,14 +410,73 @@ function generateCitation(style: CitationStyle, src: CitationSource): CitationRe
   }
 }
 
+// ─── URL Metadata Extraction ──────────────────────────────────────────────────
+
+interface OGMeta { title?: string; siteName?: string; author?: string; year?: string; month?: string; day?: string }
+
+async function fetchOGMeta(url: string): Promise<OGMeta> {
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+  const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(7000) });
+  if (!res.ok) throw new Error("Proxy request failed");
+  const data: { contents?: string } = await res.json();
+  const html = data.contents || "";
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const getMeta = (name: string) =>
+    doc.querySelector(`meta[property="${name}"]`)?.getAttribute("content") ||
+    doc.querySelector(`meta[name="${name}"]`)?.getAttribute("content") ||
+    "";
+
+  const title =
+    getMeta("og:title") ||
+    getMeta("twitter:title") ||
+    doc.querySelector("title")?.textContent?.trim() ||
+    "";
+
+  const siteName =
+    getMeta("og:site_name") ||
+    getMeta("application-name") ||
+    new URL(url).hostname.replace(/^www\./, "") ||
+    "";
+
+  const author =
+    getMeta("author") ||
+    getMeta("article:author") ||
+    "";
+
+  // Try to parse publish date
+  const rawDate =
+    getMeta("article:published_time") ||
+    getMeta("og:article:published_time") ||
+    getMeta("date") ||
+    getMeta("DC.date") ||
+    "";
+
+  let year = "", month = "", day = "";
+  if (rawDate) {
+    const d = new Date(rawDate);
+    if (!isNaN(d.getTime())) {
+      year = String(d.getFullYear());
+      month = String(d.getMonth() + 1);
+      day = String(d.getDate());
+    } else {
+      const m = rawDate.match(/(\d{4})/);
+      if (m) year = m[1];
+    }
+  }
+
+  return { title: title.trim(), siteName: siteName.trim(), author: author.trim(), year, month, day };
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const STYLES: { id: CitationStyle; label: string; short: string; color: string }[] = [
-  { id: "apa7",      label: "APA 7th",     short: "APA",  color: "rgba(67,97,238,1)" },
-  { id: "mla9",      label: "MLA 9th",     short: "MLA",  color: "rgba(16,185,129,1)" },
-  { id: "harvard",   label: "Harvard",     short: "HAR",  color: "rgba(245,158,11,1)" },
-  { id: "chicago17", label: "Chicago 17th",short: "CHI",  color: "rgba(168,85,247,1)" },
-  { id: "vancouver", label: "Vancouver",   short: "VAN",  color: "rgba(236,72,153,1)" },
+const STYLES: { id: CitationStyle; label: string; color: string }[] = [
+  { id: "apa7",      label: "APA 7th",      color: "rgba(67,97,238,1)" },
+  { id: "mla9",      label: "MLA 9th",      color: "rgba(16,185,129,1)" },
+  { id: "harvard",   label: "Harvard",      color: "rgba(245,158,11,1)" },
+  { id: "chicago17", label: "Chicago 17th", color: "rgba(168,85,247,1)" },
+  { id: "vancouver", label: "Vancouver",    color: "rgba(236,72,153,1)" },
 ];
 
 const SOURCE_TYPES: { id: SourceType; label: string; icon: React.ElementType; color: string }[] = [
@@ -460,8 +540,8 @@ function Field({ label, value, onChange, placeholder, half }: {
   placeholder?: string; half?: boolean;
 }) {
   return (
-    <div className={half ? "flex-1 min-w-[120px]" : "w-full"}>
-      <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">{label}</label>
+    <div className={half ? "flex-1 min-w-[110px]" : "w-full"}>
+      {label && <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">{label}</label>}
       <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
         className="w-full bg-white/4 border border-white/8 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-emerald-500/40 transition-colors"
       />
@@ -471,7 +551,7 @@ function Field({ label, value, onChange, placeholder, half }: {
 
 function MonthSelect({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) {
   return (
-    <div className="flex-1 min-w-[100px]">
+    <div className="flex-1 min-w-[110px]">
       {label && <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">{label}</label>}
       <select value={value} onChange={e => onChange(e.target.value)}
         className="w-full bg-white/4 border border-white/8 rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:border-emerald-500/40 transition-colors"
@@ -490,6 +570,8 @@ export default function CitationGenerator() {
   const [src, setSrc] = useState<CitationSource>(BLANK_SOURCE);
   const [result, setResult] = useState<CitationResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [fetchError, setFetchError] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>(() => {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch { return []; }
   });
@@ -502,6 +584,7 @@ export default function CitationGenerator() {
   const changeType = (t: SourceType) => {
     setSrc({ ...BLANK_SOURCE, type: t });
     setResult(null);
+    setFetchError("");
   };
 
   const generate = () => {
@@ -517,6 +600,31 @@ export default function CitationGenerator() {
     const next = [entry, ...history].slice(0, 5);
     setHistory(next);
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  };
+
+  const handleFetchMeta = async () => {
+    if (!src.url) return;
+    setFetching(true);
+    setFetchError("");
+    try {
+      const meta = await fetchOGMeta(src.url);
+      setSrc(prev => ({
+        ...prev,
+        title: meta.title || prev.title,
+        siteName: meta.siteName || prev.siteName,
+        year: meta.year || prev.year,
+        publishMonth: meta.month || prev.publishMonth,
+        publishDay: meta.day || prev.publishDay,
+        authors: meta.author
+          ? [{ last: meta.author.split(/\s+/).pop() || meta.author, first: meta.author.split(/\s+/).slice(0,-1).join(" ") }]
+          : prev.authors,
+      }));
+      setResult(null);
+    } catch {
+      setFetchError("Couldn't auto-fetch metadata — please fill in fields manually.");
+    } finally {
+      setFetching(false);
+    }
   };
 
   const copyResult = () => {
@@ -593,8 +701,42 @@ export default function CitationGenerator() {
       <div className="rounded-2xl p-5 space-y-4"
         style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)" }}
       >
+        {/* URL input + auto-fetch for Website */}
+        {src.type === "website" && (
+          <div className="space-y-2">
+            <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">URL</label>
+            <div className="flex gap-2">
+              <input value={src.url} onChange={e => update({ url: e.target.value })}
+                placeholder="https://..."
+                className="flex-1 bg-white/4 border border-white/8 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-sky-400/50 transition-colors"
+              />
+              <button
+                onClick={handleFetchMeta}
+                disabled={!src.url || fetching}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-sky-500/30 text-sky-300 text-xs font-semibold bg-sky-500/10 hover:bg-sky-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                title="Auto-fill title, site name, and date from URL"
+              >
+                {fetching
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <Wand2 className="w-3.5 h-3.5" />}
+                Auto-fill
+              </button>
+            </div>
+            {fetchError && (
+              <p className="text-[11px] text-amber-400/70 flex items-center gap-1">
+                <span>⚠</span> {fetchError}
+              </p>
+            )}
+            {!fetchError && src.url && (
+              <p className="text-[10px] text-muted-foreground/50">
+                Click Auto-fill to extract title, site name, and date from the URL (falls back to manual if unavailable)
+              </p>
+            )}
+          </div>
+        )}
+
         <AuthorFields
-          authors={src.type === "youtube" ? (src.authors.length ? src.authors : [{ first: "", last: "" }]) : src.authors}
+          authors={src.authors}
           onChange={a => update({ authors: a })}
         />
 
@@ -654,23 +796,28 @@ export default function CitationGenerator() {
           </>
         )}
 
-        {/* Website & YouTube URL */}
+        {/* Website site name (below URL) */}
+        {src.type === "website" && (
+          <Field label="Website / Organisation name" value={src.siteName} onChange={v => update({ siteName: v })} placeholder="e.g. BBC News" />
+        )}
+
+        {/* YouTube URL */}
+        {src.type === "youtube" && (
+          <Field label="URL" value={src.url} onChange={v => update({ url: v })} placeholder="https://youtube.com/watch?v=..." />
+        )}
+
+        {/* Access date for Harvard / Vancouver — shown for website & youtube */}
         {(src.type === "website" || src.type === "youtube") && (
-          <>
-            {src.type === "website" && (
-              <Field label="Website / Organisation name" value={src.siteName} onChange={v => update({ siteName: v })} placeholder="e.g. BBC News" />
-            )}
-            <Field label="URL" value={src.url} onChange={v => update({ url: v })} placeholder="https://..." />
-            {/* Access date for Harvard / Vancouver */}
-            <div>
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Access Date <span className="normal-case font-normal">(required for Harvard &amp; Vancouver)</span></p>
-              <div className="flex gap-3 flex-wrap">
-                <Field label="" value={src.accessDay} onChange={v => update({ accessDay: v })} placeholder="Day" half />
-                <MonthSelect value={src.accessMonth} onChange={v => update({ accessMonth: v })} />
-                <Field label="" value={src.accessYear} onChange={v => update({ accessYear: v })} placeholder="Year" half />
-              </div>
+          <div>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+              Access Date <span className="normal-case font-normal">(required for Harvard &amp; Vancouver)</span>
+            </p>
+            <div className="flex gap-3 flex-wrap">
+              <Field label="" value={src.accessDay} onChange={v => update({ accessDay: v })} placeholder="Day" half />
+              <MonthSelect value={src.accessMonth} onChange={v => update({ accessMonth: v })} />
+              <Field label="" value={src.accessYear} onChange={v => update({ accessYear: v })} placeholder="Year" half />
             </div>
-          </>
+          </div>
         )}
       </div>
 
@@ -701,7 +848,7 @@ export default function CitationGenerator() {
               boxShadow: `0 0 30px ${activeStyle.color}12`,
             }}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full"
                   style={{ background: `${activeStyle.color}22`, color: activeStyle.color, border: `1px solid ${activeStyle.color}33` }}
@@ -727,16 +874,16 @@ export default function CitationGenerator() {
             <p className="text-sm text-foreground leading-relaxed font-serif select-all p-3 rounded-xl"
               style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
             >
-              {result.segments.map((seg, i) =>
-                seg.italic
-                  ? <em key={i}>{seg.text}</em>
-                  : <span key={i}>{seg.text}</span>
+              {result.segments.map((s, i) =>
+                s.italic
+                  ? <em key={i}>{s.text}</em>
+                  : <span key={i}>{s.text}</span>
               )}
             </p>
 
-            <p className="text-[10px] text-muted-foreground/50 flex items-center gap-1">
-              <span>ℹ</span>
-              Italics are shown in the preview. When copying, use your word processor to apply italics to the indicated portions.
+            <p className="text-[10px] text-muted-foreground/50 flex items-start gap-1">
+              <span className="flex-shrink-0">ℹ</span>
+              <span>Italics shown above. In the copied text, italicised portions are wrapped with *asterisks* — apply italic formatting in your word processor.</span>
             </p>
           </motion.div>
         )}
@@ -760,10 +907,10 @@ export default function CitationGenerator() {
           {history.map(h => (
             <motion.div key={h.id}
               initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
-              className="rounded-xl p-3 cursor-pointer group transition-colors"
+              className="rounded-xl p-3 cursor-pointer transition-all"
               style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
               whileHover={{ borderColor: "rgba(16,185,129,0.25)", background: "rgba(16,185,129,0.04)" }}
-              onClick={() => { setResult({ plain: h.result, segments: [{ text: h.result }] }); }}
+              onClick={() => setResult({ plain: h.result, segments: [{ text: h.result }] })}
             >
               <div className="flex items-center gap-1.5 mb-1.5">
                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/6 border border-white/10 text-muted-foreground">{h.style}</span>
