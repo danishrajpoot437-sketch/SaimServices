@@ -114,7 +114,12 @@ export default function AdminPanel() {
   const restoreAutosave = () => {
     try {
       const saved = localStorage.getItem(AUTOSAVE_KEY);
-      if (saved) setForm(JSON.parse(saved) as BlogForm);
+      if (saved) {
+        setForm(JSON.parse(saved) as BlogForm);
+        setEditing(null);
+        setCreating(true);
+        setShowPreview(false);
+      }
     } catch { /* ignore */ }
   };
 
@@ -589,7 +594,7 @@ export default function AdminPanel() {
                         }
                         <span className="hidden sm:inline">{editing !== null ? "Save" : "Create"}</span>
                       </button>
-                      <button onClick={resetForm} className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors">
+                      <button type="button" onClick={resetForm} className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
@@ -630,7 +635,7 @@ export default function AdminPanel() {
                             </span>
                           )}
                         </label>
-                        <button onClick={() => setShowPreview(s => !s)}
+                        <button type="button" onClick={() => setShowPreview(s => !s)}
                           className={`flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-lg border transition-all ${
                             showPreview
                               ? "border-primary/40 bg-primary/10 text-primary"
