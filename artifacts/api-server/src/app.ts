@@ -1,26 +1,24 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
+import { pinoHttp } from "pino-http";
+import type { IncomingMessage, ServerResponse } from "http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.use(
   pinoHttp({
     logger,
     serializers: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      req(req: any) {
+      req(req: IncomingMessage) {
         return {
-          id: req.id,
+          id: (req as IncomingMessage & { id?: unknown }).id,
           method: req.method,
           url: req.url?.split("?")[0],
         };
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      res(res: any) {
+      res(res: ServerResponse) {
         return {
           statusCode: res.statusCode,
         };
