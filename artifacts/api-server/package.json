@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "export NODE_ENV=development && (fuser -k 8080/tcp 2>/dev/null || true) && pnpm run build && pnpm run start",
+    "prebuild": "tsc -p ../../lib/api-zod/tsconfig.json && tsc -p ../../lib/db/tsconfig.json",
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"

@@ -5,15 +5,8 @@
     "rootDir": "src",
     "types": ["node"],
     "strict": false,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "noEmitOnError": false
   },
-  "include": ["src"],
-  "references": [
-    {
-      "path": "../../lib/db"
-    },
-    {
-      "path": "../../lib/api-zod"
-    }
-  ]
+  "include": ["src"]
 }
