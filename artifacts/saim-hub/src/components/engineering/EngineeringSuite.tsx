@@ -74,6 +74,18 @@ export default function EngineeringSuite() {
     } catch { /* ignore */ }
   }, []);
 
+  // Listen for tab-switch events dispatched by the Navbar dropdown
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ section: string; tab: string }>).detail;
+      if (detail.section === "engineering-suite" && detail.tab) {
+        setActiveTab(detail.tab as Tab);
+      }
+    };
+    window.addEventListener("saim-section-tab", handler);
+    return () => window.removeEventListener("saim-section-tab", handler);
+  }, []);
+
   const pushHistory = useCallback((entry: HistoryEntry) => {
     setHistory(prev => {
       const next = [entry, ...prev].slice(0, 10);

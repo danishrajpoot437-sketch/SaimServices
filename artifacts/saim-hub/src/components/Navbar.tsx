@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search } from "lucide-react";
+import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search, Sigma, BarChart2 } from "lucide-react";
 import AuthModal from "./AuthModal";
 
 interface DropdownItem {
@@ -14,10 +14,12 @@ interface DropdownItem {
 
 const dropdownMenus: Record<string, DropdownItem[]> = {
   "Engineering Suite": [
-    { label: "Unit Pro", description: "Convert 9 categories of units instantly", icon: Ruler, href: "#engineering-suite" },
-    { label: "Materials Finder", description: "Properties of 8 engineering materials", icon: FlaskConical, href: "#engineering-suite" },
-    { label: "Function Grapher", description: "2D live plotter with math.js engine", icon: LineChart, href: "#engineering-suite" },
-    { label: "Eng. Constants", description: "12 click-to-copy physical constants", icon: BookOpenCheck, href: "#engineering-suite" },
+    { label: "Unit Pro",          description: "Convert 9 categories of units instantly",   icon: Ruler,        href: "#engineering-suite", tab: "unitpro"    },
+    { label: "Materials Finder",  description: "Properties of 8 engineering materials",     icon: FlaskConical, href: "#engineering-suite", tab: "materials"  },
+    { label: "Function Grapher",  description: "2D live plotter with math.js engine",       icon: LineChart,    href: "#engineering-suite", tab: "plotter"    },
+    { label: "Eng. Constants",    description: "12 click-to-copy physical constants",       icon: BookOpenCheck,href: "#engineering-suite", tab: "constants"  },
+    { label: "Math Solver",       description: "Symbolic & numeric computation engine",     icon: Sigma,        href: "#engineering-suite", tab: "mathsolver" },
+    { label: "Stat Suite",        description: "Descriptive stats & regression analysis",   icon: BarChart2,    href: "#engineering-suite", tab: "stats"      },
   ],
   "Academic Hub": [
     { label: "Study Guides",       description: "USA & UK guides, scholarships, deadlines",      icon: Library,       href: "#academic-hub", tab: "study"     },
