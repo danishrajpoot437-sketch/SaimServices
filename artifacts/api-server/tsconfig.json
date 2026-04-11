@@ -4,6 +4,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "types": ["node"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
