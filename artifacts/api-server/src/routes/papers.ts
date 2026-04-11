@@ -131,21 +131,18 @@ router.get("/papers/search", async (req: Request, res: Response) => {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 12_000);
-    let oaRes: Awaited<ReturnType<typeof fetch>>;
-    try {
-      oaRes = await fetch(upstreamUrl, {
-        headers: { "User-Agent": "SaimServices/1.0", Accept: "application/json" },
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timer);
-    }
+
+    const oaRes = await fetch(upstreamUrl, {
+      headers: { "User-Agent": "SaimServices/1.0", Accept: "application/json" },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
 
     if (!oaRes.ok) {
       return res.status(502).json({ error: `Upstream error: ${oaRes.status}` });
     }
 
-    const oaData = await oaRes.json() as OAResponse;
+    const oaData = (await oaRes.json()) as OAResponse;
     const result = {
       total: oaData.meta.count,
       data:  (oaData.results ?? []).map(transformWork),

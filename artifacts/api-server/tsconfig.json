@@ -6,6 +6,14 @@
     "types": ["node"],
     "strict": false,
     "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "strictFunctionTypes": false,
+    "noImplicitThis": false,
+    "noImplicitReturns": false,
+    "alwaysStrict": false,
+    "useUnknownInCatchVariables": false,
     "noEmitOnError": false
   },
   "include": ["src"]
