@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search, Sigma, BarChart2, Building2, Terminal } from "lucide-react";
+import { Link } from "wouter";
 import AuthModal from "./AuthModal";
 
 interface DropdownItem {
@@ -220,6 +221,11 @@ export default function Navbar() {
               {simpleLinks.slice(1).map((link) => (
                 <NavLinkSimple key={link.label} href={link.href} label={link.label} onClick={handleNavClick} />
               ))}
+              <Link href="/blog"
+                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg"
+              >
+                Blog
+              </Link>
             </div>
 
             {/* Desktop CTA */}
@@ -280,6 +286,13 @@ export default function Navbar() {
                     {link.label}
                   </a>
                 ))}
+                <Link href="/blog"
+                  onClick={() => setMobileOpen(false)}
+                  className="py-3 px-4 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors text-sm font-medium block"
+                  data-testid="mobile-nav-blog"
+                >
+                  Blog
+                </Link>
 
                 {Object.entries(dropdownMenus).map(([label, items]) => {
                   const isOpen = mobileAccordion.has(label);
