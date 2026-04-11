@@ -113,6 +113,48 @@ export default function Hero() {
         />
       </motion.div>
 
+      {/* ── Desktop Side Decorations (xl+) ── */}
+      <div className="hidden xl:flex absolute left-0 top-1/2 -translate-y-1/2 flex-col gap-4 pl-8 pointer-events-none z-10">
+        {[
+          { label: "Unit Conversions", value: "9 categories", color: "rgba(67,97,238,0.6)" },
+          { label: "Elements", value: "118 in table", color: "rgba(16,185,129,0.6)" },
+          { label: "Math Solver", value: "Symbolic AI", color: "rgba(139,92,246,0.6)" },
+        ].map(({ label, value, color }) => (
+          <motion.div key={label}
+            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl"
+            style={{ background: "rgba(10,16,40,0.55)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)" }}
+          >
+            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+            <div>
+              <div className="text-[10px] text-muted-foreground leading-none mb-0.5">{label}</div>
+              <div className="text-xs font-bold text-foreground">{value}</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <div className="hidden xl:flex absolute right-0 top-1/2 -translate-y-1/2 flex-col gap-4 pr-8 pointer-events-none z-10">
+        {[
+          { label: "Stat Suite", value: "Descriptive + Regression", color: "rgba(251,191,36,0.6)" },
+          { label: "Beam Analyst", value: "SFD · BMD · Deflection", color: "rgba(14,165,233,0.6)" },
+          { label: "Dev Kit", value: "JSON · Hash · Regex", color: "rgba(251,146,60,0.6)" },
+        ].map(({ label, value, color }) => (
+          <motion.div key={label}
+            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.6 }}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl"
+            style={{ background: "rgba(10,16,40,0.55)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)" }}
+          >
+            <div>
+              <div className="text-[10px] text-muted-foreground leading-none mb-0.5 text-right">{label}</div>
+              <div className="text-xs font-bold text-foreground text-right">{value}</div>
+            </div>
+            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+          </motion.div>
+        ))}
+      </div>
+
       {/* ── Hero Content ── */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-28">
         <motion.div

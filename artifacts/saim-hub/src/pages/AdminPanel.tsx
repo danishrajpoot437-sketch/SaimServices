@@ -574,7 +574,7 @@ export default function AdminPanel() {
                     </h2>
                     <div className="flex items-center gap-2">
                       {/* Save button (in header for quick access) */}
-                      <button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}
+                      <button type="button" onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all disabled:opacity-60"
                       >
                         {(createMut.isPending || updateMut.isPending)
@@ -589,7 +589,7 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  <div className="p-5 space-y-4">
+                  <form onSubmit={e => { e.preventDefault(); handleSave(); }} className="p-5 space-y-4">
                     {/* Title */}
                     <div>
                       <label className="text-xs font-medium text-muted-foreground block mb-1.5">Title *</label>
@@ -773,7 +773,7 @@ export default function AdminPanel() {
 
                     {/* Bottom action bar */}
                     <div className="flex items-center gap-3 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                      <button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}
+                      <button type="submit" disabled={createMut.isPending || updateMut.isPending}
                         className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 disabled:opacity-60"
                       >
                         {(createMut.isPending || updateMut.isPending)
@@ -782,7 +782,7 @@ export default function AdminPanel() {
                         }
                         {editing !== null ? "Save Changes" : "Create Post"}
                       </button>
-                      <button onClick={resetForm} className="px-4 py-2.5 rounded-xl glass-card text-sm text-muted-foreground hover:text-foreground transition-colors">
+                      <button type="button" onClick={resetForm} className="px-4 py-2.5 rounded-xl glass-card text-sm text-muted-foreground hover:text-foreground transition-colors">
                         Cancel
                       </button>
                       {words > 0 && (
@@ -791,7 +791,7 @@ export default function AdminPanel() {
                         </span>
                       )}
                     </div>
-                  </div>
+                  </form>
                 </motion.div>
               ) : (
                 <motion.div key="empty-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
