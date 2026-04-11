@@ -44,6 +44,20 @@ function categoryColor(cat: string) {
   return CATEGORY_COLORS[cat.toLowerCase()] ?? CATEGORY_COLORS.general;
 }
 
+/** Handles both comma-separated "a,b,c" and PostgreSQL array "{\"a\",\"b\",\"c\"}" formats */
+function parseTags(raw: string): string[] {
+  if (!raw) return [];
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    return trimmed
+      .slice(1, -1)
+      .split(",")
+      .map(t => t.replace(/^"|"$/g, "").trim())
+      .filter(Boolean);
+  }
+  return trimmed.split(",").map(t => t.trim()).filter(Boolean);
+}
+
 function formatDate(iso: string | null) {
   if (!iso) return "";
   return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -197,7 +211,7 @@ export default function BlogList() {
                       </p>
                       {filtered[0].tags && (
                         <div className="flex flex-wrap gap-1.5 mb-5">
-                          {filtered[0].tags.split(",").slice(0, 4).map(t => t.trim()).filter(Boolean).map(t => (
+                          {parseTags(filtered[0].tags).slice(0, 4).map(t => (
                             <span key={t} className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
                               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
                             >
@@ -278,7 +292,7 @@ export default function BlogList() {
                         {/* Tags */}
                         {blog.tags && (
                           <div className="flex flex-wrap gap-1.5 mb-4">
-                            {blog.tags.split(",").slice(0, 3).map(t => t.trim()).filter(Boolean).map(t => (
+                            {parseTags(blog.tags).slice(0, 3).map(t => (
                               <span key={t} className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
                                 style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
                               >

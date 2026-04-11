@@ -45,6 +45,16 @@ const CATEGORY_COLORS: Record<string, string> = {
   general:     "bg-white/8 text-muted-foreground border-white/15",
 };
 
+/** Handles both comma-separated "a,b,c" and PostgreSQL array "{\"a\",\"b\",\"c\"}" formats */
+function parseTags(raw: string): string[] {
+  if (!raw) return [];
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    return trimmed.slice(1, -1).split(",").map(t => t.replace(/^"|"$/g, "").trim()).filter(Boolean);
+  }
+  return trimmed.split(",").map(t => t.trim()).filter(Boolean);
+}
+
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
 
@@ -181,7 +191,7 @@ export default function BlogPost() {
                 <span className="text-xs text-muted-foreground flex items-center gap-1.5 mr-1">
                   <Tag className="w-3.5 h-3.5" /> Tags:
                 </span>
-                {blog.tags.split(",").map(t => t.trim()).filter(Boolean).map(t => (
+                {parseTags(blog.tags).map(t => (
                   <span key={t}
                     className="text-xs px-3 py-1 rounded-full font-medium"
                     style={{ background: "rgba(67,97,238,0.1)", border: "1px solid rgba(67,97,238,0.2)", color: "#93c5fd" }}

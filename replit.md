@@ -43,9 +43,18 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### Database (`lib/db`)
 - PostgreSQL via `@workspace/db` (Drizzle ORM)
 - Schema: `blogsTable` — id, title, slug, excerpt, content, category, tags, coverImage, author, status (draft/published/scheduled), readTime, scheduledAt, publishedAt, createdAt, updatedAt
+- Slug auto-generated from title + timestamp suffix (e.g. `getting-started-with-beam-analysis-mnubp7by`)
+- Tags stored as PostgreSQL text[] when sent as JSON array; frontend uses `parseTags()` helper in BlogList.tsx and BlogPost.tsx to handle both `{a,b}` PG array and `a,b` CSV formats
 
-### Canvas (`artifacts/mockup-sandbox`)
-- Design mockup sandbox
+## Bug Fixes (April 2026 QA Pass)
+
+### Math Solver (`MathSolver.tsx`)
+1. **Variable detection regex**: `[a-df-wyz]` → `[a-df-z]` — the old range accidentally excluded 'x' (the most common variable). Equations like "6x + 5 = 14" were misdetected as "evaluate" type and crashed when mathjs saw the `=` operator.
+2. **Derivative parsing**: Rewrote expression extraction using `stripOuterParens()` instead of a fragile regex with `[\(\[]?(.+?)[\)\]]?$`. The old regex stripped the closing `)` of `cos(x)` in `d/dx(x^2 * cos(x))`, producing invalid `"x^2 * cos(x"`.
+3. **Exponential detection**: Updated regex from `[a-df-wyz]` to `[a-df-z]` for consistency.
+
+### Blog (`BlogList.tsx`, `BlogPost.tsx`)
+- Added `parseTags()` helper that handles both PostgreSQL array format `{"a","b","c"}` and comma-separated `a,b,c` — previously tags sent as JSON arrays showed as `{"research"}` in the UI.
 
 ## Key Commands
 

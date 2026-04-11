@@ -40,13 +40,14 @@ function detect(raw: string): ProblemType {
   if (s.includes("∫") || sl.startsWith("int(")) return "integral";
   if (/\bC\s*\(\s*\d+\s*,\s*\d+\s*\)/i.test(s) || /\bP\s*\(\s*\d+\s*,\s*\d+\s*\)/i.test(s)) return "probability";
   if (s.includes(";")) return "system";
-  const hasVar = /[a-df-wyz]/i.test(s.replace(/sin|cos|tan|log|exp|sqrt|pi|abs/gi, ""));
+  // [a-df-z] intentionally excludes 'e' (Euler's constant) but includes 'x','y','z', etc.
+  const hasVar = /[a-df-z]/i.test(s.replace(/sin|cos|tan|log|exp|sqrt|pi|abs/gi, ""));
   const isComplexNum = s.includes("i") && /\d/.test(s);
   if (s.includes("=")) {
-    const inner = s.replace(/\|/g, "");
     if (/\|.+\|/.test(s)) return "absolute";
     const lhs = s.split("=")[0];
-    if (/[a-df-wyz]\^[a-df-wyz]/i.test(lhs) || /\^\s*[a-df-wyz]/i.test(lhs)) return "exponential";
+    // Exponential: base^variable  e.g. 5^x, 2^n (caret followed by a letter)
+    if (/\^\s*[a-df-z]/i.test(lhs)) return "exponential";
     const san = sanitize(s.replace("=", "-(") + ")");
     if (/x\^2|y\^2|z\^2/.test(san)) return "quadratic";
     if (hasVar) return "linear";
@@ -256,11 +257,23 @@ function solveSimplify(raw: string): { steps: Step[]; result: string } {
   return { steps, result };
 }
 
+function stripOuterParens(s: string): string {
+  if (!s.startsWith("(") || !s.endsWith(")")) return s;
+  let depth = 0;
+  for (let i = 0; i < s.length - 1; i++) {
+    if (s[i] === "(") depth++;
+    else if (s[i] === ")") { depth--; if (depth === 0) return s; }
+  }
+  return s.slice(1, -1).trim();
+}
+
 function solveDerivative(raw: string): { steps: Step[]; result: string } {
   let expr = raw.trim();
-  const m = expr.match(/^d\s*\/\s*d([a-z])\s*[\(\[]?(.+?)[\)\]]?$/i);
-  const v = m ? m[1] : "x";
-  expr = m ? sanitize(m[2].trim().replace(/^\(|\)$/g, "")) : sanitize(expr);
+  const vMatch = expr.match(/^d\s*\/\s*d([a-z])/i);
+  const v = vMatch ? vMatch[1] : "x";
+  let body = expr.replace(/^d\s*\/\s*d[a-z]\s*/i, "").trim();
+  body = stripOuterParens(body);
+  expr = sanitize(body);
   const derivNode = derivative(expr, v);
   const result = simplify(derivNode).toString();
   const steps: Step[] = [
