@@ -71,16 +71,27 @@ export default function Navbar() {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, tab?: string) => {
     e.preventDefault();
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-    if (tab) {
-      // Small delay so the section is visible before the tab switches
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("saim-section-tab", { detail: { section: href.slice(1), tab } }));
-      }, 120);
-    }
-    setMobileOpen(false);
     setActiveDropdown(null);
+
+    const scrollAndSwitch = () => {
+      const el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+      if (tab) {
+        setTimeout(() => {
+          window.dispatchEvent(
+            new CustomEvent("saim-section-tab", { detail: { section: href.slice(1), tab } })
+          );
+        }, 120);
+      }
+    };
+
+    if (mobileOpen) {
+      // Close the mobile overlay first, then scroll once the exit animation finishes
+      setMobileOpen(false);
+      setTimeout(scrollAndSwitch, 300); // 250ms exit animation + 50ms buffer
+    } else {
+      scrollAndSwitch();
+    }
   };
 
   const openDropdown = (label: string) => {
