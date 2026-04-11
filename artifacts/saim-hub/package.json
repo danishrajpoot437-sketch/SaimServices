@@ -75,6 +75,7 @@
     "zod": "catalog:"
   },
   "dependencies": {
-    "mathjs": "^15.2.0"
+    "mathjs": "^15.2.0",
+    "plotly.js-dist-min": "^3.5.0"
   }
 }
