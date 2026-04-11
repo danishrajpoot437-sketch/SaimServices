@@ -76,6 +76,17 @@ export default function Navbar() {
     e.preventDefault();
     setActiveDropdown(null);
 
+    // If the target section doesn't exist on this page (e.g. we're on /blog),
+    // navigate to home with the hash so the browser lands on the right section.
+    const targetEl = document.querySelector(href);
+    if (!targetEl) {
+      const base = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
+      // Include the tab as a query param so Home.tsx can activate it on load
+      const query = tab ? `?tab=${tab}` : "";
+      window.location.assign(`${base}/${query}${href}`);
+      return;
+    }
+
     const scrollAndSwitch = () => {
       const el = document.querySelector(href);
       if (el) el.scrollIntoView({ behavior: "smooth" });

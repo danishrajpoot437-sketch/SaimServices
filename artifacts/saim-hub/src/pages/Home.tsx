@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import ToolsOverview from "@/components/ToolsOverview";
@@ -20,6 +20,36 @@ function SectionSkeleton() {
 }
 
 export default function Home() {
+  // When navigated here from another page (e.g. /blog) with ?tab=xxx#section,
+  // scroll to the section and activate the correct tab after content loads.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab    = params.get("tab");
+    const hash   = window.location.hash; // e.g. "#engineering-suite"
+    if (!hash) return;
+    const tryScroll = (attempt = 0) => {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+        if (tab) {
+          setTimeout(() => {
+            window.dispatchEvent(
+              new CustomEvent("saim-section-tab", { detail: { section: hash.slice(1), tab } })
+            );
+          }, 250);
+        }
+        // Clean up the ?tab param from the URL bar without re-rendering
+        const clean = new URL(window.location.href);
+        clean.searchParams.delete("tab");
+        window.history.replaceState({}, "", clean.toString());
+      } else if (attempt < 10) {
+        // Section might not be rendered yet — retry up to 10× every 100 ms
+        setTimeout(() => tryScroll(attempt + 1), 100);
+      }
+    };
+    tryScroll();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
