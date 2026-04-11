@@ -424,8 +424,7 @@ export default function AdminPanel() {
               </button>
 
               <p className="text-center text-xs text-muted-foreground pt-2">
-                Default password: <code className="text-primary/80 bg-primary/8 px-1.5 py-0.5 rounded">SaimAdmin2025</code>{" "}
-                — set <code className="text-primary/80 bg-primary/8 px-1.5 py-0.5 rounded">ADMIN_PASSWORD</code> in Secrets to change it
+                Set <code className="text-primary/80 bg-primary/8 px-1.5 py-0.5 rounded">ADMIN_PASSWORD</code> in your environment Secrets to configure the admin password.
               </p>
             </form>
           </motion.div>
