@@ -50,6 +50,13 @@ interface OAWork {
 
 interface OAResponse { results: OAWork[]; meta: { count: number; page: number; per_page: number } }
 
+// Explicit fetch response shape — avoids @types/node version skew on Vercel
+interface FetchResponse {
+  ok: boolean;
+  status: number;
+  json(): Promise<unknown>;
+}
+
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function reconstructAbstract(idx: Record<string, number[]> | null): string {
   if (!idx) return "";
@@ -135,7 +142,7 @@ router.get("/papers/search", async (req: Request, res: ExResponse) => {
     const oaRes = await fetch(upstreamUrl, {
       headers: { "User-Agent": "SaimServices/1.0", Accept: "application/json" },
       signal: controller.signal,
-    });
+    }) as unknown as FetchResponse;
     clearTimeout(timer);
 
     if (!oaRes.ok) {
