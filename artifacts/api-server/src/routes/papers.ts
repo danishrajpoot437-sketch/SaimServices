@@ -1,4 +1,4 @@
-import { Router, type Request, type Response } from "express";
+import { Router, type Request, type Response as ExResponse } from "express";
 
 const router = Router();
 
@@ -93,7 +93,7 @@ function transformWork(w: OAWork) {
 const VALID_SORTS    = new Set(["relevance", "citationCount", "year"]);
 const VALID_SUBJECTS = new Set(["all", "cs", "physics", "math", "biology", "medicine", "chemistry", "engineering"]);
 
-router.get("/papers/search", async (req: Request, res: Response) => {
+router.get("/papers/search", async (req: Request, res: ExResponse) => {
   const rawQuery = String(req.query.query  ?? "").trim();
   const subject  = String(req.query.subject ?? "all");
   const sort     = String(req.query.sort    ?? "relevance");
