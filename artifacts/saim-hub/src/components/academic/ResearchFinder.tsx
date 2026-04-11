@@ -88,7 +88,7 @@ async function fetchPapers(query: string, subject: string, sort: string, offset 
     const errData = await res.json().catch(() => ({})) as { error?: string };
     throw new Error(errData.error || `Search failed (${res.status})`);
   }
-  return res.json();
+  return await res.json() as SearchResponse;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -116,11 +116,11 @@ function PaperCard({ paper, savedIds, onToggleSave }: {
 
   const paperUrl = arxivId
     ? `https://arxiv.org/abs/${arxivId}`
-    : pubmedId
-    ? `https://pubmed.ncbi.nlm.nih.gov/${pubmedId}/`
     : doi
     ? `https://doi.org/${doi}`
-    : `https://www.semanticscholar.org/paper/${paper.paperId}`;
+    : pubmedId
+    ? `https://pubmed.ncbi.nlm.nih.gov/${pubmedId}/`
+    : `https://openalex.org/${paper.paperId.replace("https://openalex.org/", "")}`;
 
   const copyRef = () => {
     const ref = `${formatAuthors(paper.authors)} (${paper.year || "n.d."}). ${paper.title}${paper.venue ? ". " + paper.venue : ""}${doi ? ". https://doi.org/" + doi : ""}`;
@@ -280,12 +280,16 @@ export default function ResearchFinder() {
       setOffset(off + (data.data?.length || 0));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Search failed";
-      if (msg.includes("429")) {
-        setError("Too many requests — please wait a moment and try again.");
-      } else if (msg.includes("Failed to fetch") || msg.includes("NetworkError")) {
+      if (msg.includes("429") || msg.includes("rate limit") || msg.includes("Too many")) {
+        setError("Rate limit reached — please wait a moment and try again.");
+      } else if (msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("network")) {
         setError("Network error — check your connection and try again.");
+      } else if (msg.includes("JSON") || msg.includes("Unexpected token")) {
+        setError("Server returned unexpected data. Please try again.");
+      } else if (msg.includes("timeout") || msg.includes("AbortError")) {
+        setError("Search timed out — please try again.");
       } else {
-        setError(`Search failed: ${msg}`);
+        setError(`Search error: ${msg}`);
       }
     } finally {
       setLoading(false);
@@ -324,7 +328,7 @@ export default function ResearchFinder() {
         <div>
           <h3 className="text-base font-bold text-foreground">Research Paper Finder</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Search 200M+ papers from arXiv, PubMed, Nature, IEEE, ACM and more — powered by Semantic Scholar
+            Search 200M+ papers from arXiv, PubMed, Nature, IEEE, ACM and more — powered by OpenAlex
           </p>
         </div>
       </div>
@@ -416,7 +420,7 @@ export default function ResearchFinder() {
             ))}
           </div>
           <p className="text-[10px] text-muted-foreground/50">
-            Data from Semantic Scholar · Covers arXiv, PubMed, Nature, IEEE, ACM and 200M+ papers
+            Data from OpenAlex · Covers arXiv, PubMed, Nature, IEEE, ACM and 200M+ papers · No rate limits
           </p>
         </motion.div>
       )}
@@ -468,7 +472,7 @@ export default function ResearchFinder() {
                 <span className="ml-1" style={{ color: activeSubject.color }}>· {activeSubject.label}</span>
               )}
             </p>
-            <span className="text-[10px] text-muted-foreground/50">via Semantic Scholar</span>
+            <span className="text-[10px] text-muted-foreground/50">via OpenAlex</span>
           </div>
 
           {results.map((paper, i) => (

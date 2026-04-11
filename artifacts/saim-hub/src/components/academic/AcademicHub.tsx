@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, Calculator, Building2, Quote, Search } from "lucide-react";
 import StudyGuides from "./StudyGuides";
@@ -35,6 +35,18 @@ function LoadingSpinner() {
 
 export default function AcademicHub() {
   const [activeTool, setActiveTool] = useState<Tool>("study");
+
+  // Listen for tab-switch events dispatched by the Navbar dropdown
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ section: string; tab: string }>).detail;
+      if (detail.section === "academic-hub") {
+        setActiveTool(detail.tab as Tool);
+      }
+    };
+    window.addEventListener("saim-section-tab", handler);
+    return () => window.removeEventListener("saim-section-tab", handler);
+  }, []);
 
   return (
     <section id="academic-hub" className="py-28 px-4 sm:px-6 lg:px-8 section-bg relative overflow-hidden">

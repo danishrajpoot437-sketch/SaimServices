@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeftRight, Layers, TrendingUp, Atom,
   Sigma, FlaskConical, Maximize2, Minimize2,
-  History, X, Zap, Clock, ChevronRight,
+  History, X, Zap, Clock, ChevronRight, BarChart2,
 } from "lucide-react";
 import UnitPro from "./UnitPro";
 import MaterialFinder from "./MaterialFinder";
@@ -12,8 +12,9 @@ import EngineeringConstants from "./EngineeringConstants";
 import MathSolver, { type HistoryEntry } from "./MathSolver";
 import GraphLab from "./GraphLab";
 import PeriodicTable from "./PeriodicTable";
+import StatSuite from "./StatSuite";
 
-type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic";
+type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats";
 type EngineStatus = "idle" | "computing" | "done" | "error";
 
 const HISTORY_KEY = "saimservices_eng_history";
@@ -34,6 +35,7 @@ const tabs: {
   { id: "mathsolver",  label: "Math Solver",   icon: Sigma,          description: "Symbolic computation", badge: "NEW", isNew: true, color: "rgba(67,97,238,1)" },
   { id: "graphlab",    label: "Graph Lab",     icon: TrendingUp,     description: "Multi-function plots", badge: "NEW", isNew: true, color: "rgba(16,185,129,1)" },
   { id: "periodic",    label: "Chem Table",    icon: FlaskConical,   description: "118 elements",         badge: "NEW", isNew: true, color: "rgba(245,158,11,1)" },
+  { id: "stats",       label: "Stat Suite",    icon: BarChart2,      description: "Descriptive · Regression", badge: "NEW", isNew: true, color: "rgba(139,92,246,1)" },
 ];
 
 const contentVariants = {
@@ -243,6 +245,7 @@ export default function EngineeringSuite() {
                 {activeTab === "mathsolver" && <MathSolver onHistoryPush={pushHistory} onStatusChange={handleStatusChange} />}
                 {activeTab === "graphlab"   && <GraphLab  onHistoryPush={pushHistory} onStatusChange={handleStatusChange} />}
                 {activeTab === "periodic"   && <PeriodicTable />}
+                {activeTab === "stats"      && <StatSuite />}
               </motion.div>
             </AnimatePresence>
           </div>

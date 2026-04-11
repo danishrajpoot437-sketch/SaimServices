@@ -9,6 +9,7 @@ interface DropdownItem {
   description: string;
   icon: React.ElementType;
   href: string;
+  tab?: string;
 }
 
 const dropdownMenus: Record<string, DropdownItem[]> = {
@@ -19,11 +20,11 @@ const dropdownMenus: Record<string, DropdownItem[]> = {
     { label: "Eng. Constants", description: "12 click-to-copy physical constants", icon: BookOpenCheck, href: "#engineering-suite" },
   ],
   "Academic Hub": [
-    { label: "Study Guides", description: "USA & UK guides, scholarships, deadlines", icon: Library, href: "#academic-hub" },
-    { label: "GPA Converter", description: "USA 4.0 ↔ UK Honours dual system", icon: GraduationCap, href: "#academic-hub" },
-    { label: "Citation Generator", description: "APA · MLA · Harvard · Chicago · Vancouver — free", icon: Quote, href: "#academic-hub" },
-    { label: "Research Finder", description: "Search arXiv, PubMed & Semantic Scholar papers", icon: Search, href: "#academic-hub" },
-    { label: "Resource Center", description: "Common App, FAFSA, UCAS & more", icon: BookOpenCheck, href: "#academic-hub" },
+    { label: "Study Guides",       description: "USA & UK guides, scholarships, deadlines",      icon: Library,       href: "#academic-hub", tab: "study"     },
+    { label: "GPA Converter",      description: "USA 4.0 ↔ UK Honours dual system",              icon: GraduationCap, href: "#academic-hub", tab: "gpa"       },
+    { label: "Citation Generator", description: "APA · MLA · Harvard · Chicago · Vancouver",     icon: Quote,         href: "#academic-hub", tab: "citations" },
+    { label: "Research Finder",    description: "Search arXiv, PubMed & 200M+ papers",           icon: Search,        href: "#academic-hub", tab: "research"  },
+    { label: "Resource Center",    description: "Common App, FAFSA, UCAS & more",                icon: BookOpenCheck, href: "#academic-hub", tab: "tracker"   },
   ],
   "Resources": [
     { label: "File Converter", description: "Word, PDF, Image & Text conversions", icon: FileInput, href: "#content-powerhouse" },
@@ -66,10 +67,16 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, tab?: string) => {
     e.preventDefault();
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (tab) {
+      // Small delay so the section is visible before the tab switches
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("saim-section-tab", { detail: { section: href.slice(1), tab } }));
+      }, 120);
+    }
     setMobileOpen(false);
     setActiveDropdown(null);
   };
@@ -170,7 +177,7 @@ export default function Navbar() {
                             <a
                               key={item.label}
                               href={item.href}
-                              onClick={(e) => handleNavClick(e, item.href)}
+                              onClick={(e) => handleNavClick(e, item.href, item.tab)}
                               className="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-white/6 transition-colors group/item"
                               data-testid={`dropdown-item-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                             >
@@ -286,7 +293,7 @@ export default function Navbar() {
                                 <a
                                   key={item.label}
                                   href={item.href}
-                                  onClick={(e) => handleNavClick(e, item.href)}
+                                  onClick={(e) => handleNavClick(e, item.href, item.tab)}
                                   className="flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors text-sm"
                                   data-testid={`mobile-dropdown-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                                 >
