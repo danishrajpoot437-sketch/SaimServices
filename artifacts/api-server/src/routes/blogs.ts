@@ -103,7 +103,7 @@ router.post("/admin/blogs", requireAdmin, async (req, res) => {
 /* ── Admin: update blog ──────────────────────────────────────────────────── */
 router.put("/admin/blogs/:id", requireAdmin, async (req, res) => {
   try {
-    const id   = parseInt(req.params.id);
+    const id   = parseInt(String(req.params.id));
     const body = req.body as Partial<{
       title: string; excerpt: string; content: string; category: string;
       tags: string; coverImage: string; author: string;
@@ -142,7 +142,7 @@ router.put("/admin/blogs/:id", requireAdmin, async (req, res) => {
 /* ── Admin: delete blog ──────────────────────────────────────────────────── */
 router.delete("/admin/blogs/:id", requireAdmin, async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(String(req.params.id));
     await db.delete(blogsTable).where(eq(blogsTable.id, id));
     res.json({ ok: true });
   } catch {
