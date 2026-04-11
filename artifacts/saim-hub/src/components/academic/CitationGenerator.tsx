@@ -43,13 +43,18 @@ interface CitationSource {
 
 interface CitationSegment { text: string; italic?: boolean }
 interface CitationResult { plain: string; segments: CitationSegment[] }
-interface HistoryItem { id: string; style: string; sourceType: string; result: string; ts: number }
+interface HistoryItem { id: string; style: string; sourceType: string; result: string; segments: CitationSegment[]; ts: number }
 
 const HISTORY_KEY = "saimservices_citation_history";
 const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 // ─── Formatting Helpers ───────────────────────────────────────────────────────
+
+/** Drop blank author rows so formatters never produce awkward empty-name output */
+function cleanAuthors(authors: Author[]): Author[] {
+  return authors.filter(a => a.last.trim() || a.first.trim());
+}
 
 function initials(name: string): string {
   return name.trim().split(/\s+/).filter(Boolean).map(n => n[0].toUpperCase() + ".").join(" ");
@@ -120,7 +125,8 @@ function shortMonth(m: string): string { const i = parseInt(m); return (!isNaN(i
 // ─── Citation Formatters ──────────────────────────────────────────────────────
 
 function formatAPA7(src: CitationSource): CitationResult {
-  const authStr = formatAuthorsAPA(src.authors);
+  const authors = cleanAuthors(src.authors);
+  const authStr = formatAuthorsAPA(authors);
   const year = src.year || "n.d.";
   switch (src.type) {
     case "book": {
@@ -163,8 +169,8 @@ function formatAPA7(src: CitationSource): CitationResult {
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
-        ? formatAuthorsAPA(src.authors)
+      const creator = authors.length
+        ? formatAuthorsAPA(authors)
         : (src.channelName || "Creator");
       const dateStr = (src.videoDay || src.videoMonth)
         ? `, ${src.videoMonth ? fullMonth(src.videoMonth) : ""} ${src.videoDay || ""}`.trim()
@@ -181,7 +187,8 @@ function formatAPA7(src: CitationSource): CitationResult {
 }
 
 function formatMLA9(src: CitationSource): CitationResult {
-  const authStr = formatAuthorsMLA(src.authors);
+  const authors = cleanAuthors(src.authors);
+  const authStr = formatAuthorsMLA(authors);
   switch (src.type) {
     case "book": {
       const ed = src.edition ? `, ${src.edition} ed.,` : "";
@@ -216,8 +223,8 @@ function formatMLA9(src: CitationSource): CitationResult {
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
-        ? formatAuthorsMLA(src.authors)
+      const creator = authors.length
+        ? formatAuthorsMLA(authors)
         : (src.channelName || "Creator");
       const dateStr = [src.videoDay, src.videoMonth ? fullMonth(src.videoMonth) : "", src.year]
         .filter(Boolean).join(" ").trim() || src.year || "n.d.";
@@ -234,7 +241,8 @@ function formatMLA9(src: CitationSource): CitationResult {
 }
 
 function formatHarvard(src: CitationSource): CitationResult {
-  const authStr = formatAuthorsHarvard(src.authors);
+  const authors = cleanAuthors(src.authors);
+  const authStr = formatAuthorsHarvard(authors);
   const year = src.year || "n.d.";
   switch (src.type) {
     case "book": {
@@ -275,8 +283,8 @@ function formatHarvard(src: CitationSource): CitationResult {
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
-        ? formatAuthorsHarvard(src.authors)
+      const creator = authors.length
+        ? formatAuthorsHarvard(authors)
         : (src.channelName || "Creator");
       const accDate = src.accessDay && src.accessMonth && src.accessYear
         ? ` (Accessed: ${src.accessDay} ${fullMonth(src.accessMonth)} ${src.accessYear})`
@@ -294,7 +302,8 @@ function formatHarvard(src: CitationSource): CitationResult {
 }
 
 function formatChicago17(src: CitationSource): CitationResult {
-  const authStr = formatAuthorsChicago(src.authors);
+  const authors = cleanAuthors(src.authors);
+  const authStr = formatAuthorsChicago(authors);
   switch (src.type) {
     case "book": {
       const place = src.place || "Place";
@@ -330,8 +339,8 @@ function formatChicago17(src: CitationSource): CitationResult {
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
-        ? formatAuthorsChicago(src.authors)
+      const creator = authors.length
+        ? formatAuthorsChicago(authors)
         : (src.channelName || "Creator");
       const dateStr = [fullMonth(src.videoMonth || ""), src.videoDay, src.year]
         .filter(Boolean).join(" ").trim() || src.year || "n.d.";
@@ -347,7 +356,8 @@ function formatChicago17(src: CitationSource): CitationResult {
 }
 
 function formatVancouver(src: CitationSource): CitationResult {
-  const authStr = formatAuthorsVancouver(src.authors);
+  const authors = cleanAuthors(src.authors);
+  const authStr = formatAuthorsVancouver(authors);
   switch (src.type) {
     case "book": {
       const ed = src.edition ? ` ${src.edition} ed.` : "";
@@ -384,8 +394,8 @@ function formatVancouver(src: CitationSource): CitationResult {
       ]);
     }
     case "youtube": {
-      const creator = src.authors.length && (src.authors[0].last || src.authors[0].first)
-        ? formatAuthorsVancouver(src.authors)
+      const creator = authors.length
+        ? formatAuthorsVancouver(authors)
         : (src.channelName || "Creator");
       const accDate = src.accessYear
         ? `[cited ${src.accessYear} ${shortMonth(src.accessMonth || "")} ${src.accessDay || ""}]`.trim()
@@ -595,6 +605,7 @@ export default function CitationGenerator() {
       style: STYLES.find(s => s.id === style)!.label,
       sourceType: SOURCE_TYPES.find(s => s.id === src.type)!.label,
       result: r.plain,
+      segments: r.segments,
       ts: Date.now(),
     };
     const next = [entry, ...history].slice(0, 5);
@@ -910,7 +921,7 @@ export default function CitationGenerator() {
               className="rounded-xl p-3 cursor-pointer transition-all"
               style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
               whileHover={{ borderColor: "rgba(16,185,129,0.25)", background: "rgba(16,185,129,0.04)" }}
-              onClick={() => setResult({ plain: h.result, segments: [{ text: h.result }] })}
+              onClick={() => setResult({ plain: h.result, segments: h.segments || [{ text: h.result }] })}
             >
               <div className="flex items-center gap-1.5 mb-1.5">
                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/6 border border-white/10 text-muted-foreground">{h.style}</span>
