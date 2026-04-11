@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search, Sigma, BarChart2, Building2, Terminal } from "lucide-react";
+import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search, Sigma, BarChart2, Building2, Terminal, LogOut, User } from "lucide-react";
 import { Link } from "wouter";
 import AuthModal from "./AuthModal";
+import { useAuth } from "@/context/AuthContext";
 
 interface DropdownItem {
   label: string;
@@ -32,9 +33,9 @@ const dropdownMenus: Record<string, DropdownItem[]> = {
     { label: "Resource Center",    description: "Common App, FAFSA, UCAS & more",                icon: BookOpenCheck, href: "#academic-hub", tab: "tracker"   },
   ],
   "Resources": [
-    { label: "File Converter", description: "Word, PDF, Image & Text conversions", icon: FileInput, href: "#content-powerhouse" },
-    { label: "Content Analyzer", description: "Case transform, word count, keywords", icon: AlignLeft, href: "#content-powerhouse" },
-    { label: "News Feed", description: "Curated AI, Engineering & Scholarship news", icon: Rss, href: "#news-feed" },
+    { label: "File Converter",    description: "Word, PDF, Image & Text conversions",        icon: FileInput, href: "#content-powerhouse" },
+    { label: "Content Analyzer",  description: "Case transform, word count, keywords",       icon: AlignLeft, href: "#content-powerhouse" },
+    { label: "News Feed",         description: "Curated AI, Engineering & Scholarship news", icon: Rss,       href: "#news-feed"          },
   ],
 };
 
@@ -50,16 +51,29 @@ const simpleLinks = [
   { label: "About", href: "#about" },
 ];
 
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+const AVATAR_GRADIENT = "linear-gradient(135deg, #4361ee 0%, #0ea5e9 100%)";
+
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const [scrolled, setScrolled]       = useState(false);
+  const [mobileOpen, setMobileOpen]   = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileAccordion, setMobileAccordion] = useState<Set<string>>(new Set());
-  const [authOpen, setAuthOpen] = useState(false);
+  const [authOpen, setAuthOpen]       = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userMenuRef   = useRef<HTMLDivElement>(null);
 
   const toggleMobileAccordion = (label: string) => {
-    setMobileAccordion(prev => {
+    setMobileAccordion((prev) => {
       const next = new Set(prev);
       next.has(label) ? next.delete(label) : next.add(label);
       return next;
@@ -72,16 +86,23 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, tab?: string) => {
     e.preventDefault();
     setActiveDropdown(null);
 
-    // If the target section doesn't exist on this page (e.g. we're on /blog),
-    // navigate to home with the hash so the browser lands on the right section.
     const targetEl = document.querySelector(href);
     if (!targetEl) {
       const base = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
-      // Include the tab as a query param so Home.tsx can activate it on load
       const query = tab ? `?tab=${tab}` : "";
       window.location.assign(`${base}/${query}${href}`);
       return;
@@ -100,26 +121,16 @@ export default function Navbar() {
     };
 
     if (mobileOpen) {
-      // Close the mobile overlay first, then scroll once the exit animation finishes
       setMobileOpen(false);
-      setTimeout(scrollAndSwitch, 300); // 250ms exit animation + 50ms buffer
+      setTimeout(scrollAndSwitch, 300);
     } else {
       scrollAndSwitch();
     }
   };
 
-  const openDropdown = (label: string) => {
-    if (dropdownTimer.current) clearTimeout(dropdownTimer.current);
-    setActiveDropdown(label);
-  };
-
-  const closeDropdown = () => {
-    dropdownTimer.current = setTimeout(() => setActiveDropdown(null), 120);
-  };
-
-  const keepOpen = () => {
-    if (dropdownTimer.current) clearTimeout(dropdownTimer.current);
-  };
+  const openDropdown  = (label: string) => { if (dropdownTimer.current) clearTimeout(dropdownTimer.current); setActiveDropdown(label); };
+  const closeDropdown = () => { dropdownTimer.current = setTimeout(() => setActiveDropdown(null), 120); };
+  const keepOpen      = () => { if (dropdownTimer.current) clearTimeout(dropdownTimer.current); };
 
   return (
     <>
@@ -129,9 +140,7 @@ export default function Navbar() {
           background: scrolled ? "rgba(22, 33, 62, 0.94)" : "rgba(22, 33, 62, 0.60)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          borderBottom: scrolled
-            ? "1px solid rgba(67, 97, 238, 0.2)"
-            : "1px solid rgba(255, 255, 255, 0.06)",
+          borderBottom: scrolled ? "1px solid rgba(67, 97, 238, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
           boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.3)" : "none",
         }}
       >
@@ -155,12 +164,10 @@ export default function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-0.5">
-              {/* Tools link */}
               {simpleLinks.slice(0, 1).map((link) => (
                 <NavLinkSimple key={link.label} href={link.href} label={link.label} onClick={handleNavClick} />
               ))}
 
-              {/* Dropdown links */}
               {Object.keys(dropdownMenus).map((label) => (
                 <div
                   key={label}
@@ -196,7 +203,6 @@ export default function Navbar() {
                         }}
                         data-testid={`dropdown-${label.toLowerCase().replace(/\s+/g, "-")}`}
                       >
-                        {/* Top shine */}
                         <div className="h-px w-full"
                           style={{ background: "linear-gradient(90deg, transparent, rgba(67,97,238,0.5), transparent)" }} />
                         <div className="p-2">
@@ -228,7 +234,6 @@ export default function Navbar() {
                 </div>
               ))}
 
-              {/* Remaining simple links */}
               {simpleLinks.slice(1).map((link) => (
                 <NavLinkSimple key={link.label} href={link.href} label={link.label} onClick={handleNavClick} />
               ))}
@@ -239,29 +244,103 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Desktop CTA */}
-            <div className="hidden md:flex items-center gap-2">
-              <motion.button
-                onClick={() => setAuthOpen(true)}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-white/6 transition-all border border-white/8"
-                data-testid="btn-sign-in"
-              >
-                <LogIn className="w-3.5 h-3.5" />
-                Sign In
-              </motion.button>
-              <motion.button
-                onClick={() => setAuthOpen(true)}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-lg"
-                style={{ boxShadow: "0 0 16px rgba(67,97,238,0.35)" }}
-                data-testid="button-get-started"
-              >
-                Get Started
-              </motion.button>
-            </div>
+            {/* Desktop CTA — signed out */}
+            {!user ? (
+              <div className="hidden md:flex items-center gap-2">
+                <motion.button
+                  onClick={() => setAuthOpen(true)}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-white/6 transition-all border border-white/8"
+                  data-testid="btn-sign-in"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  Sign In
+                </motion.button>
+                <motion.button
+                  onClick={() => setAuthOpen(true)}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity shadow-lg"
+                  style={{ boxShadow: "0 0 16px rgba(67,97,238,0.35)" }}
+                  data-testid="button-get-started"
+                >
+                  Get Started
+                </motion.button>
+              </div>
+            ) : (
+              /* Desktop CTA — signed in */
+              <div className="hidden md:flex items-center gap-3 relative" ref={userMenuRef}>
+                <span className="text-sm text-muted-foreground hidden lg:block">
+                  Hi, <span className="text-foreground font-semibold">{user.name.split(" ")[0]}</span>
+                </span>
+                <button
+                  onClick={() => setUserMenuOpen((o) => !o)}
+                  className="flex items-center gap-2 rounded-full focus:outline-none group"
+                  data-testid="btn-user-menu"
+                >
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ring-2 ring-primary/30 group-hover:ring-primary/60 transition-all"
+                    style={{ background: AVATAR_GRADIENT, boxShadow: "0 0 14px rgba(67,97,238,0.3)" }}
+                  >
+                    {getInitials(user.name)}
+                  </div>
+                </button>
+
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                      transition={{ duration: 0.17, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute top-full right-0 mt-2 w-56 rounded-2xl overflow-hidden z-50 shadow-2xl"
+                      style={{
+                        background: "rgba(18, 28, 58, 0.98)",
+                        backdropFilter: "blur(24px)",
+                        border: "1px solid rgba(67,97,238,0.25)",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+                      }}
+                    >
+                      <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(67,97,238,0.5), transparent)" }} />
+                      <div className="p-3">
+                        <div className="px-3 py-2.5 mb-1">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                              style={{ background: AVATAR_GRADIENT }}
+                            >
+                              {getInitials(user.name)}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{user.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="h-px bg-white/6 my-2" />
+                        <button
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                          onClick={() => { setUserMenuOpen(false); }}
+                          data-testid="btn-my-account"
+                        >
+                          <User className="w-4 h-4" />
+                          My Account
+                        </button>
+                        <button
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/8 transition-colors"
+                          onClick={() => { setUserMenuOpen(false); signOut(); }}
+                          data-testid="btn-sign-out"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Sign Out
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
 
             {/* Mobile toggle */}
             <button
@@ -348,22 +427,49 @@ export default function Navbar() {
                   );
                 })}
 
-                <div className="flex gap-2 mt-3 pt-3 border-t border-white/5">
-                  <button
-                    onClick={() => { setMobileOpen(false); setAuthOpen(true); }}
-                    className="flex-1 py-3 px-4 rounded-xl border border-white/10 text-sm font-semibold text-foreground text-center hover:bg-white/5 transition-colors"
-                    data-testid="mobile-btn-sign-in"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => { setMobileOpen(false); setAuthOpen(true); }}
-                    className="flex-1 py-3 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold text-center"
-                    data-testid="mobile-btn-get-started"
-                  >
-                    Get Started
-                  </button>
-                </div>
+                {/* Mobile auth section */}
+                {user ? (
+                  <div className="mt-3 pt-3 border-t border-white/5">
+                    <div className="flex items-center gap-3 px-4 py-3 mb-2">
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                        style={{ background: AVATAR_GRADIENT }}
+                      >
+                        {getInitials(user.name)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => { setMobileOpen(false); signOut(); }}
+                      className="w-full flex items-center gap-2.5 py-3 px-4 rounded-xl text-rose-400 hover:bg-rose-500/8 transition-colors text-sm font-semibold"
+                      data-testid="mobile-btn-sign-out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-white/5">
+                    <button
+                      onClick={() => { setMobileOpen(false); setAuthOpen(true); }}
+                      className="flex-1 py-3 px-4 rounded-xl border border-white/10 text-sm font-semibold text-foreground text-center hover:bg-white/5 transition-colors"
+                      data-testid="mobile-btn-sign-in"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => { setMobileOpen(false); setAuthOpen(true); }}
+                      className="flex-1 py-3 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold text-center"
+                      style={{ boxShadow: "0 0 16px rgba(67,97,238,0.3)" }}
+                      data-testid="mobile-btn-get-started"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

@@ -28,7 +28,7 @@ const columns = [
       "Designed to the standard of paid SaaS tools",
       "Open to engineers, students, and self-learners",
     ],
-    stat: { value: "10K+", label: "Active Users" },
+    stat: { value: "50K+", label: "Active Users" },
     StatIcon: Users,
   },
   {

@@ -46,6 +46,13 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - Slug auto-generated from title + timestamp suffix (e.g. `getting-started-with-beam-analysis-mnubp7by`)
 - Tags stored as PostgreSQL text[] when sent as JSON array; frontend uses `parseTags()` helper in BlogList.tsx and BlogPost.tsx to handle both `{a,b}` PG array and `a,b` CSV formats
 
+## Auth System (localStorage-based)
+- **Context**: `artifacts/saim-hub/src/context/AuthContext.tsx` — React context with `useAuth()` hook
+- **Storage**: Users stored in `localStorage` as JSON under `saim_users_v1`; session under `saim_session_v1`
+- **Modal**: `AuthModal.tsx` — tabbed Sign In / Sign Up with password strength indicator, error states, success animation
+- **Navbar integration**: Shows user avatar (gradient circle + initials) when signed in; dropdown with Sign Out; mobile menu shows user info + sign-out button
+- **No backend auth** — purely client-side (no JWT, no backend routes needed for this feature)
+
 ## Bug Fixes (April 2026 QA Pass)
 
 ### Math Solver (`MathSolver.tsx`)

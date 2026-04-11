@@ -347,7 +347,7 @@ export default function AdminPanel() {
           {/* Stats footer */}
           <div className="relative flex items-center gap-6">
             {[
-              { icon: Users,  val: "10K+", label: "Monthly readers" },
+              { icon: Users,  val: "50K+", label: "Monthly readers" },
               { icon: Cpu,    val: "10+",  label: "Tools published" },
               { icon: Globe,  val: "50+",  label: "Countries reached" },
             ].map(({ icon: Icon, val, label }) => (

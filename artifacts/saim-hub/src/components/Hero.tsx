@@ -48,10 +48,10 @@ export default function Hero() {
   };
 
   const stats = [
-    { label: "Tools Available", value: "10+" },
-    { label: "Engineering Tools", value: "3" },
-    { label: "Academic Tools", value: "3" },
-    { label: "Users Worldwide", value: "10K+" },
+    { label: "Tools Available", value: "20+", color: "#4361ee" },
+    { label: "Engineering Tools", value: "10", color: "#0ea5e9" },
+    { label: "Academic Tools", value: "5", color: "#8b5cf6" },
+    { label: "Users Worldwide", value: "50K+", color: "#f59e0b" },
   ];
 
   return (
@@ -314,20 +314,32 @@ export default function Hero() {
           {/* Stats */}
           <motion.div
             variants={itemVariants}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-2xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto"
           >
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 + i * 0.1, duration: 0.4, ease: "easeOut" }}
-                className="text-center group"
+                initial={{ opacity: 0, scale: 0.85, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.8 + i * 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ scale: 1.06, y: -2 }}
+                className="relative text-center group cursor-default px-3 py-4 rounded-2xl"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: `1px solid ${stat.color}28`,
+                  boxShadow: `0 0 24px ${stat.color}0a`,
+                }}
               >
-                <div className="text-3xl font-bold gradient-text-blue mb-1 group-hover:scale-105 transition-transform duration-200">
+                {/* Top accent line */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-px rounded-full"
+                  style={{ background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)` }} />
+                <div
+                  className="text-3xl font-bold mb-1 transition-transform duration-200"
+                  style={{ color: stat.color, textShadow: `0 0 20px ${stat.color}60` }}
+                >
                   {stat.value}
                 </div>
-                <div className="text-xs text-muted-foreground font-medium tracking-wide">{stat.label}</div>
+                <div className="text-xs text-muted-foreground font-medium tracking-wide leading-tight">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
