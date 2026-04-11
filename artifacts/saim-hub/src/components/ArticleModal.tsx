@@ -205,6 +205,8 @@ export default function ArticleModal({ article, onClose, bookmarked, onToggleBoo
                   src={article.image}
                   alt={article.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               </div>

@@ -34,19 +34,19 @@ export default function AcademicHub() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-12"
+          className="text-center mb-12"
         >
-          <div className="flex items-center gap-4 mb-5">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <motion.div
               whileInView={{ scale: [0.8, 1.1, 1] }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center"
+              className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0"
               style={{ boxShadow: "0 0 20px rgba(16,185,129,0.25)" }}
             >
               <GraduationCap className="w-5 h-5 text-emerald-400" />
             </motion.div>
-            <div>
+            <div className="text-left">
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -56,7 +56,7 @@ export default function AcademicHub() {
               >
                 Academic Hub · USA & UK Focused
               </motion.span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-display">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground font-display">
                 Your Academic{" "}
                 <span style={{ background: "linear-gradient(135deg, #22c55e, #10b981)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                   Command Center
@@ -64,12 +64,12 @@ export default function AcademicHub() {
               </h2>
             </div>
           </div>
-          <p className="text-muted-foreground max-w-xl ml-[60px] leading-relaxed">
+          <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
             Precision tools for US & UK academic success — GPA conversion, study guides, scholarships,
             deadlines, and official application portals, all in one place.
           </p>
-          <div className="w-48 h-px mt-6 ml-[60px] rounded-full"
-            style={{ background: "linear-gradient(90deg, rgba(16,185,129,0.5), rgba(52,211,153,0.2), transparent)" }}
+          <div className="w-48 h-px mt-6 mx-auto rounded-full"
+            style={{ background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.5), rgba(52,211,153,0.2), transparent)" }}
           />
         </motion.div>
 
