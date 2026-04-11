@@ -126,8 +126,8 @@ export default function EngineeringSuite() {
   const workspace = (
     <div className={`relative ${fullscreen ? "min-h-screen py-4 px-4 sm:px-8" : ""}`}>
       {/* ── Tab Navigation ── */}
-      <div className="overflow-x-auto pb-1 -mx-1 px-1 mb-4">
-        <div className="flex gap-1.5 min-w-max">
+      <div className="overflow-x-auto lg:overflow-visible pb-1 -mx-1 px-1 mb-4">
+        <div className="flex flex-nowrap lg:flex-wrap gap-1.5 min-w-max lg:min-w-0">
           {tabs.map((tab, i) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

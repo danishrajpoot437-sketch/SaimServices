@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock, Tag, ArrowRight, Search, BookOpen, Rss } from "lucide-react";
+import { Calendar, Clock, Tag, ArrowRight, Search, BookOpen, Rss, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -151,9 +151,85 @@ export default function BlogList() {
             </div>
           )}
 
+          {/* ── Featured post (first article, only when not filtered / searching) ── */}
+          {!isLoading && !error && !search && category === "All" && filtered.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span className="text-xs font-semibold text-amber-400 tracking-widest uppercase">Featured Article</span>
+              </div>
+              <Link href={`/blog/${filtered[0].slug}`}>
+                <div className="group rounded-3xl overflow-hidden cursor-pointer transition-all duration-300"
+                  style={{
+                    background: "rgba(10,16,40,0.7)",
+                    border: "1px solid rgba(255,255,255,0.09)",
+                    boxShadow: "0 8px 40px rgba(0,0,0,0.3)",
+                  }}
+                >
+                  <div className="flex flex-col lg:flex-row">
+                    {/* Cover image */}
+                    <div className="relative overflow-hidden lg:w-[45%] xl:w-[40%] flex-shrink-0 h-56 sm:h-72 lg:h-auto min-h-[240px]">
+                      {filtered[0].coverImage ? (
+                        <img src={filtered[0].coverImage} alt={filtered[0].title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center"
+                          style={{ background: "linear-gradient(135deg, rgba(67,97,238,0.2) 0%, rgba(14,165,233,0.1) 100%)" }}
+                        >
+                          <BookOpen className="w-16 h-16 text-primary/20" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 lg:bg-gradient-to-r lg:from-transparent lg:to-[rgba(10,16,40,0.4)]" />
+                      <div className="absolute top-4 left-4">
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border capitalize ${categoryColor(filtered[0].category)}`}>
+                          {filtered[0].category}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Content */}
+                    <div className="flex-1 p-6 lg:p-10 flex flex-col justify-center">
+                      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-tight mb-3 group-hover:text-primary transition-colors">
+                        {filtered[0].title}
+                      </h2>
+                      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-5 line-clamp-3">
+                        {filtered[0].excerpt}
+                      </p>
+                      {filtered[0].tags && (
+                        <div className="flex flex-wrap gap-1.5 mb-5">
+                          {filtered[0].tags.split(",").slice(0, 4).map(t => t.trim()).filter(Boolean).map(t => (
+                            <span key={t} className="flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full"
+                              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                            >
+                              <Tag className="w-2.5 h-2.5" />{t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {formatDate(filtered[0].publishedAt || filtered[0].createdAt)}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5" />{filtered[0].readTime} min read
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-primary font-semibold group-hover:gap-3 transition-all">
+                          Read article <ArrowRight className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          )}
+
           <AnimatePresence>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((blog, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {((!search && category === "All" && filtered.length > 1) ? filtered.slice(1) : filtered).map((blog, i) => (
                 <motion.article
                   key={blog.id}
                   initial={{ opacity: 0, y: 20 }}
