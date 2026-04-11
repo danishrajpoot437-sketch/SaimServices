@@ -54,7 +54,13 @@ async function apiFetch(path: string, options: RequestInit = {}): Promise<Respon
 /* ── Markdown → HTML renderer (safe subset) ─────────────────────────────── */
 function renderContent(content: string): string {
   if (!content) return "";
-  if (content.trim().startsWith("<")) return content;
+  if (content.trim().startsWith("<")) {
+    /* Admin-authored HTML: strip dangerous tags/attrs before preview rendering */
+    return content
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/on\w+="[^"]*"/gi, "")
+      .replace(/on\w+='[^']*'/gi, "");
+  }
   return content
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/^### (.+)$/gm, "<h3 style='color:#e2e8f0;font-size:1.05rem;font-weight:700;margin:1.5rem 0 0.5rem'>$1</h3>")

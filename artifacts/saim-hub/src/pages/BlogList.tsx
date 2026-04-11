@@ -227,9 +227,11 @@ export default function BlogList() {
             </motion.div>
           )}
 
+          {/* Grid — skip first post when it's shown as featured (no-search, All category) */}
+          {(!search && category === "All" && filtered.length <= 1) ? null : (
           <AnimatePresence>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {((!search && category === "All" && filtered.length > 1) ? filtered.slice(1) : filtered).map((blog, i) => (
+              {((!search && category === "All") ? filtered.slice(1) : filtered).map((blog, i) => (
                 <motion.article
                   key={blog.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -308,6 +310,7 @@ export default function BlogList() {
               ))}
             </div>
           </AnimatePresence>
+          )}
         </div>
       </main>
 
