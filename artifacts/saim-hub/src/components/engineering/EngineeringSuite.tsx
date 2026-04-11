@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeftRight, Layers, TrendingUp, Atom,
   Sigma, FlaskConical, Maximize2, Minimize2,
-  History, X, Zap, Clock, ChevronRight, BarChart2,
+  History, X, Zap, Clock, ChevronRight, BarChart2, Building2,
 } from "lucide-react";
 import UnitPro from "./UnitPro";
 import MaterialFinder from "./MaterialFinder";
@@ -13,8 +13,9 @@ import MathSolver, { type HistoryEntry } from "./MathSolver";
 import GraphLab from "./GraphLab";
 import PeriodicTable from "./PeriodicTable";
 import StatSuite from "./StatSuite";
+import BeamCalculator from "./BeamCalculator";
 
-type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats";
+type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats" | "beam";
 type EngineStatus = "idle" | "computing" | "done" | "error";
 
 const HISTORY_KEY = "saimservices_eng_history";
@@ -36,6 +37,7 @@ const tabs: {
   { id: "graphlab",    label: "Graph Lab",     icon: TrendingUp,     description: "Multi-function plots", badge: "NEW", isNew: true, color: "rgba(16,185,129,1)" },
   { id: "periodic",    label: "Chem Table",    icon: FlaskConical,   description: "118 elements",         badge: "NEW", isNew: true, color: "rgba(245,158,11,1)" },
   { id: "stats",       label: "Stat Suite",    icon: BarChart2,      description: "Descriptive · Regression", badge: "NEW", isNew: true, color: "rgba(139,92,246,1)" },
+  { id: "beam",        label: "Beam Analyst",  icon: Building2,      description: "SFD · BMD · Deflection",   badge: "PRO", isNew: true, color: "rgba(16,185,129,1)" },
 ];
 
 const contentVariants = {
@@ -258,6 +260,7 @@ export default function EngineeringSuite() {
                 {activeTab === "graphlab"   && <GraphLab  onHistoryPush={pushHistory} onStatusChange={handleStatusChange} />}
                 {activeTab === "periodic"   && <PeriodicTable />}
                 {activeTab === "stats"      && <StatSuite />}
+                {activeTab === "beam"       && <BeamCalculator />}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -409,8 +412,9 @@ export default function EngineeringSuite() {
             </div>
           </div>
           <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            7 professional tools in one workspace — symbolic math, multi-function graphing, the full periodic table,
-            unit conversion, materials science, function plotting, and engineering constants.
+            9 professional tools in one workspace — structural beam analysis (SFD · BMD · deflection),
+            symbolic math, multi-function graphing, the full periodic table, statistical analysis,
+            unit conversion, materials, function plotting, and engineering constants.
           </p>
           <div className="section-divider w-48 mt-5 mx-auto" />
         </motion.div>
