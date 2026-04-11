@@ -46,8 +46,17 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileAccordion, setMobileAccordion] = useState<Set<string>>(new Set());
   const [authOpen, setAuthOpen] = useState(false);
   const dropdownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const toggleMobileAccordion = (label: string) => {
+    setMobileAccordion(prev => {
+      const next = new Set(prev);
+      next.has(label) ? next.delete(label) : next.add(label);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -248,23 +257,48 @@ export default function Navbar() {
                   </a>
                 ))}
 
-                {Object.entries(dropdownMenus).map(([label, items]) => (
-                  <div key={label}>
-                    <p className="py-2 px-4 text-xs font-semibold text-primary tracking-wider uppercase mt-2">{label}</p>
-                    {items.map((item) => (
-                      <a
-                        key={item.label}
-                        href={item.href}
-                        onClick={(e) => handleNavClick(e, item.href)}
-                        className="flex items-center gap-2.5 py-2.5 px-5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors text-sm"
-                        data-testid={`mobile-dropdown-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                {Object.entries(dropdownMenus).map(([label, items]) => {
+                  const isOpen = mobileAccordion.has(label);
+                  return (
+                    <div key={label} className="rounded-xl overflow-hidden border border-white/5 mt-1">
+                      <button
+                        onClick={() => toggleMobileAccordion(label)}
+                        className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-foreground hover:bg-white/5 transition-colors"
+                        data-testid={`mobile-accordion-${label.toLowerCase().replace(/\s+/g, "-")}`}
                       >
-                        <item.icon className="w-4 h-4 text-primary/70" />
-                        {item.label}
-                      </a>
-                    ))}
-                  </div>
-                ))}
+                        <span className="text-primary">{label}</span>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key="content"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pb-1.5 px-1">
+                              {items.map((item) => (
+                                <a
+                                  key={item.label}
+                                  href={item.href}
+                                  onClick={(e) => handleNavClick(e, item.href)}
+                                  className="flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors text-sm"
+                                  data-testid={`mobile-dropdown-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                                >
+                                  <item.icon className="w-4 h-4 text-primary/70 flex-shrink-0" />
+                                  {item.label}
+                                </a>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
 
                 <div className="flex gap-2 mt-3 pt-3 border-t border-white/5">
                   <button

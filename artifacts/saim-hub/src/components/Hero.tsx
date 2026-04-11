@@ -150,7 +150,7 @@ export default function Hero() {
             variants={itemVariants}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            The professional ecosystem for engineers, students, and researchers.
+            The professional ecosystem for engineers, students, and researchers.{" "}
             <br className="hidden sm:block" />
             Built for those who demand precision, speed, and elegance.
           </motion.p>

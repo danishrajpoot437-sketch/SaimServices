@@ -73,7 +73,7 @@ export default function NewsCard({
       data-testid={`news-card-${id}`}
     >
       {/* Image */}
-      <div className="relative h-48 overflow-hidden flex-shrink-0">
+      <div className="relative overflow-hidden flex-shrink-0" style={{ aspectRatio: "16/9" }}>
         <motion.img
           src={image}
           alt={title}
