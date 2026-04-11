@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search, Sigma, BarChart2, Building2 } from "lucide-react";
+import { Menu, X, Zap, ChevronDown, Ruler, FlaskConical, LineChart, BookOpenCheck, GraduationCap, Library, FileInput, AlignLeft, Rss, LogIn, Quote, Search, Sigma, BarChart2, Building2, Terminal } from "lucide-react";
 import AuthModal from "./AuthModal";
 
 interface DropdownItem {
@@ -21,6 +21,7 @@ const dropdownMenus: Record<string, DropdownItem[]> = {
     { label: "Math Solver",       description: "Symbolic & numeric computation engine",     icon: Sigma,        href: "#engineering-suite", tab: "mathsolver" },
     { label: "Stat Suite",        description: "Descriptive stats & regression analysis",   icon: BarChart2,    href: "#engineering-suite", tab: "stats"      },
     { label: "Beam Analyst",      description: "SFD · BMD · deflection — free vs £40/mo",  icon: Building2,    href: "#engineering-suite", tab: "beam"       },
+    { label: "Dev Kit",           description: "JSON · Hash · Regex · Color · Timestamp",  icon: Terminal,     href: "#engineering-suite", tab: "devkit"     },
   ],
   "Academic Hub": [
     { label: "Study Guides",       description: "USA & UK guides, scholarships, deadlines",      icon: Library,       href: "#academic-hub", tab: "study"     },

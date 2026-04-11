@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeftRight, Layers, TrendingUp, Atom,
   Sigma, FlaskConical, Maximize2, Minimize2,
-  History, X, Zap, Clock, ChevronRight, BarChart2, Building2,
+  History, X, Zap, Clock, ChevronRight, BarChart2, Building2, Terminal,
 } from "lucide-react";
 import UnitPro from "./UnitPro";
 import MaterialFinder from "./MaterialFinder";
@@ -14,8 +14,9 @@ import GraphLab from "./GraphLab";
 import PeriodicTable from "./PeriodicTable";
 import StatSuite from "./StatSuite";
 import BeamCalculator from "./BeamCalculator";
+import DevKit from "./DevKit";
 
-type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats" | "beam";
+type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats" | "beam" | "devkit";
 type EngineStatus = "idle" | "computing" | "done" | "error";
 
 const HISTORY_KEY = "saimservices_eng_history";
@@ -37,7 +38,8 @@ const tabs: {
   { id: "graphlab",    label: "Graph Lab",     icon: TrendingUp,     description: "Multi-function plots", badge: "NEW", isNew: true, color: "rgba(16,185,129,1)" },
   { id: "periodic",    label: "Chem Table",    icon: FlaskConical,   description: "118 elements",         badge: "NEW", isNew: true, color: "rgba(245,158,11,1)" },
   { id: "stats",       label: "Stat Suite",    icon: BarChart2,      description: "Descriptive · Regression", badge: "NEW", isNew: true, color: "rgba(139,92,246,1)" },
-  { id: "beam",        label: "Beam Analyst",  icon: Building2,      description: "SFD · BMD · Deflection",   badge: "PRO", isNew: true, color: "rgba(16,185,129,1)" },
+  { id: "beam",        label: "Beam Analyst",  icon: Building2,      description: "SFD · BMD · Deflection",   badge: "PRO", isNew: true, color: "rgba(16,185,129,1)"  },
+  { id: "devkit",      label: "Dev Kit",       icon: Terminal,       description: "JSON · Hash · Regex · Color", badge: "HOT", isNew: true, color: "rgba(251,146,60,1)"  },
 ];
 
 const contentVariants = {
@@ -261,6 +263,7 @@ export default function EngineeringSuite() {
                 {activeTab === "periodic"   && <PeriodicTable />}
                 {activeTab === "stats"      && <StatSuite />}
                 {activeTab === "beam"       && <BeamCalculator />}
+                {activeTab === "devkit"     && <DevKit />}
               </motion.div>
             </AnimatePresence>
           </div>
