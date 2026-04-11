@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import FeatureHighlights from "@/components/FeatureHighlights";
 import ToolsOverview from "@/components/ToolsOverview";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
@@ -55,6 +56,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
+        <FeatureHighlights />
         <ToolsOverview />
         <Suspense fallback={<SectionSkeleton />}>
           <EngineeringSuite />

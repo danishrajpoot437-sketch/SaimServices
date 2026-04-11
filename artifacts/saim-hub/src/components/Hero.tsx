@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { Search, ArrowRight, Calculator, BookOpen, FileText, ChevronDown } from "lucide-react";
+import { Search, ArrowRight, Calculator, BookOpen, FileText, ChevronDown, Sparkles, CheckCircle2, X as XClose } from "lucide-react";
 import { toolsData } from "@/data/toolsData";
 
 const containerVariants: Variants = {
@@ -16,13 +16,35 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: "easeOut" } },
 };
 
+const DISCOVERY_ITEMS = [
+  { icon: "✅", label: "Solve Quadratic & Linear Equations" },
+  { icon: "✅", label: "Calculate Beam Deflection & SFD" },
+  { icon: "✅", label: "Balance Chemical Reactions" },
+  { icon: "✅", label: "Plot 2D/3D Function Graphs" },
+  { icon: "✅", label: "Convert Units Across 9 Categories" },
+  { icon: "✅", label: "Generate Citations (APA/MLA/Harvard)" },
+];
+
 export default function Hero() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<typeof toolsData>([]);
   const [focused, setFocused] = useState(false);
+  const [discoveryOpen, setDiscoveryOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const discoveryRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const parallaxY = useTransform(scrollY, [0, 600], [0, -80]);
+
+  useEffect(() => {
+    if (!discoveryOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (discoveryRef.current && !discoveryRef.current.contains(e.target as Node)) {
+        setDiscoveryOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [discoveryOpen]);
 
   useEffect(() => {
     if (query.trim().length > 0) {
@@ -281,6 +303,102 @@ export default function Hero() {
                 </motion.div>
               )}
             </AnimatePresence>
+          </motion.div>
+
+          {/* ── Discovery Badge ── */}
+          <motion.div variants={itemVariants} className="flex justify-center mb-7">
+            <div className="relative" ref={discoveryRef}>
+              <motion.button
+                onClick={() => setDiscoveryOpen((o) => !o)}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 relative overflow-hidden"
+                style={{
+                  background: "linear-gradient(135deg, rgba(67,97,238,0.18) 0%, rgba(14,165,233,0.12) 100%)",
+                  border: "1px solid rgba(67,97,238,0.35)",
+                  color: "#7ba3ff",
+                  boxShadow: discoveryOpen
+                    ? "0 0 28px rgba(67,97,238,0.3), 0 4px 16px rgba(0,0,0,0.2)"
+                    : "0 0 16px rgba(67,97,238,0.15)",
+                }}
+                data-testid="btn-discovery"
+              >
+                <motion.span
+                  animate={{ rotate: discoveryOpen ? 45 : 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                </motion.span>
+                What can I solve today?
+                <motion.span
+                  animate={{ rotate: discoveryOpen ? 180 : 0 }}
+                  transition={{ duration: 0.22 }}
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </motion.span>
+              </motion.button>
+
+              {/* Discovery dropdown */}
+              <AnimatePresence>
+                {discoveryOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-80 rounded-2xl overflow-hidden z-50 shadow-2xl"
+                    style={{
+                      background: "rgba(10, 16, 46, 0.98)",
+                      border: "1px solid rgba(67,97,238,0.3)",
+                      backdropFilter: "blur(24px)",
+                      WebkitBackdropFilter: "blur(24px)",
+                      boxShadow: "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset",
+                    }}
+                  >
+                    {/* Top glow */}
+                    <div className="h-px w-full"
+                      style={{ background: "linear-gradient(90deg, transparent, rgba(67,97,238,0.6), rgba(14,165,233,0.5), transparent)" }} />
+
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs font-bold text-foreground/70 uppercase tracking-widest">
+                          Today you can…
+                        </p>
+                        <button
+                          onClick={() => setDiscoveryOpen(false)}
+                          className="w-5 h-5 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/8 transition-colors"
+                        >
+                          <XClose className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      <ul className="space-y-1">
+                        {DISCOVERY_ITEMS.map((item, i) => (
+                          <motion.li
+                            key={item.label}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.05, duration: 0.2 }}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors group cursor-default"
+                          >
+                            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+                            <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                              {item.label}
+                            </span>
+                          </motion.li>
+                        ))}
+                      </ul>
+
+                      <div className="mt-3 pt-3 border-t border-white/6">
+                        <p className="text-[10px] text-muted-foreground/50 text-center">
+                          All tools are free · No account required
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
 
           {/* Quick Access Chips */}
