@@ -1,0 +1,44 @@
+I need to fix the syntax errors in my Math Solver and expand its capabilities for students from SSC to PhD level. Please implement the following professional logic:
+
+1. Input Sanitization & Error Handling:
+
+The Fix: The current error 'Symbol or string expected' is because the parser is sensitive. Implement a Pre-processor function that automatically converts user input:
+
+Change 4x to 4 * x.
+
+Change ^2 to ^2 (ensure it's using the correct power symbol).
+
+Use a try-catch block so if there is an error, instead of a red crash, show a friendly message: 'Check your signs! (e.g., use * for multiplication)'.
+
+2. Multi-Level Math Logic (SSC to Postgraduate):
+Expand the mathjs integration to support:
+
+SSC/Intermediate: Basic arithmetic (+, -, *, /), Algebra, and Quadratic Equations.
+
+Undergraduate (BS/BE): Matrices (Addition, Inverse, Determinant), Complex Numbers, and Advanced Trigonometry.
+
+Postgraduate (MSc/PhD): Symbolic Derivatives, Anti-derivatives (Integrals), and Statistics (Standard Deviation, Variance).
+
+3. Advanced UI Features:
+
+Mode Toggle: Add a small dropdown or tabs for 'Basic', 'Calculus', and 'Matrices' modes.
+
+Formula Preview: Use MathJax or KaTeX to show a 'Pretty Print' version of the question above the result so students can verify what they typed.
+
+Smart Suggestions: Below the input box, add small 'Quick Buttons' for symbols like √, ∫, d/dx, and π so users don't have to type them.
+
+4. Performance Polish:
+
+Ensure the computation happens in a Web Worker if it’s a complex matrix or integral, so the UI doesn't freeze (keeping our Desktop score high).
+
+Keep the 'History' feature active so students can track their previous solutions."*
+
+Yar, SSC se PhD tak ke Students ko ye kyun pasand aayega?
+SSC/Intermediate: Unhein aksar multiplication sign (*) bhool jata hai. Aapka automatic fixer (4x -> 4*x) unka gussa khatam kar dega.
+
+Engineering/BS: Matrices aur Calculus handle karne wala tool free mein milna unke liye bohat bari baat hai.
+
+Masters/PhD: Statistics aur symbolic math unke research papers mein help karega.
+
+Ek Pro Tip:
+Aapne mein jo error dekha, wo 4x^{2} ki wajah se bhi ho sakta hai. Standard computer logic mein isay 4 * x^2 likhna parta hai. Jo prompt main ne diya hai, wo Replit ko kahega ke user ke likhne ke tareeqe ko "Clean" kare taake library confuse na ho.
