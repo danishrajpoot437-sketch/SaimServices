@@ -1,17 +1,26 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, BookOpen, Calculator, Building2 } from "lucide-react";
+import { GraduationCap, BookOpen, Calculator, Building2, Quote } from "lucide-react";
 import StudyGuides from "./StudyGuides";
 import GPAConverter from "./GPAConverter";
 import UniversityTracker from "./UniversityTracker";
 import ResourceCenter from "./ResourceCenter";
 
-type Tool = "study" | "gpa" | "tracker";
+const CitationGenerator = lazy(() => import("./CitationGenerator"));
 
-const tools: { id: Tool; label: string; icon: React.ComponentType<{ className?: string }>; description: string }[] = [
-  { id: "study",   label: "Study Guides",  icon: BookOpen,    description: "USA & UK · Scholarships · Deadlines" },
-  { id: "gpa",     label: "GPA Converter", icon: Calculator,  description: "USA 4.0 · UK Honours system" },
-  { id: "tracker", label: "Uni Tracker",   icon: Building2,   description: "Application management" },
+type Tool = "study" | "gpa" | "tracker" | "citations";
+
+const tools: {
+  id: Tool;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  isNew?: boolean;
+}[] = [
+  { id: "study",     label: "Study Guides",  icon: BookOpen,     description: "USA & UK · Scholarships · Deadlines" },
+  { id: "gpa",       label: "GPA Converter", icon: Calculator,   description: "USA 4.0 · UK Honours system" },
+  { id: "tracker",   label: "Uni Tracker",   icon: Building2,    description: "Application management" },
+  { id: "citations", label: "Citations",     icon: Quote,        description: "APA · MLA · Harvard · Chicago · Vancouver", isNew: true },
 ];
 
 export default function AcademicHub() {
@@ -66,7 +75,7 @@ export default function AcademicHub() {
           </div>
           <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
             Precision tools for US & UK academic success — GPA conversion, study guides, scholarships,
-            deadlines, and official application portals, all in one place.
+            deadlines, application portals, and a free citation generator for all major styles.
           </p>
           <div className="w-48 h-px mt-6 mx-auto rounded-full"
             style={{ background: "linear-gradient(90deg, transparent, rgba(16,185,129,0.5), rgba(52,211,153,0.2), transparent)" }}
@@ -79,53 +88,60 @@ export default function AcademicHub() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5"
+          className="overflow-x-auto pb-1 -mx-1 px-1 mb-5"
         >
-          {tools.map((tool, i) => (
-            <motion.button
-              key={tool.id}
-              onClick={() => setActiveTool(tool.id)}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
-              whileHover={{ y: -2, transition: { type: "spring", stiffness: 400, damping: 20 } }}
-              whileTap={{ scale: 0.97 }}
-              className={`relative flex items-center gap-3 p-4 rounded-2xl border transition-colors duration-200 text-left overflow-hidden ${
-                activeTool === tool.id
-                  ? "border-emerald-500/40"
-                  : "glass-card hover:border-emerald-500/20"
-              }`}
-              data-testid={`btn-academic-tool-${tool.id}`}
-            >
-              {activeTool === tool.id && (
-                <motion.div
-                  layoutId="academic-active-bg"
-                  className="absolute inset-0 rounded-2xl"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(16,185,129,0.14) 0%, rgba(52,211,153,0.06) 100%)",
-                    boxShadow: "0 0 20px rgba(16,185,129,0.1) inset",
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )}
-              <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
-                activeTool === tool.id ? "bg-emerald-500/25" : "bg-white/5"
-              }`}>
-                <tool.icon className={`w-4 h-4 transition-colors duration-200 ${
-                  activeTool === tool.id ? "text-emerald-400" : "text-muted-foreground"
-                }`} />
-              </div>
-              <div className="relative">
-                <div className={`text-sm font-semibold transition-colors duration-200 ${
-                  activeTool === tool.id ? "text-foreground" : "text-muted-foreground"
+          <div className="flex gap-2 min-w-max sm:min-w-0 sm:grid sm:grid-cols-4">
+            {tools.map((tool, i) => (
+              <motion.button
+                key={tool.id}
+                onClick={() => setActiveTool(tool.id)}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
+                whileHover={{ y: -2, transition: { type: "spring", stiffness: 400, damping: 20 } }}
+                whileTap={{ scale: 0.97 }}
+                className={`relative flex items-center gap-3 p-4 rounded-2xl border transition-colors duration-200 text-left overflow-hidden ${
+                  activeTool === tool.id
+                    ? "border-emerald-500/40"
+                    : "glass-card hover:border-emerald-500/20"
+                }`}
+                data-testid={`btn-academic-tool-${tool.id}`}
+              >
+                {activeTool === tool.id && (
+                  <motion.div
+                    layoutId="academic-active-bg"
+                    className="absolute inset-0 rounded-2xl"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(16,185,129,0.14) 0%, rgba(52,211,153,0.06) 100%)",
+                      boxShadow: "0 0 20px rgba(16,185,129,0.1) inset",
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                  activeTool === tool.id ? "bg-emerald-500/25" : "bg-white/5"
                 }`}>
-                  {tool.label}
+                  <tool.icon className={`w-4 h-4 transition-colors duration-200 ${
+                    activeTool === tool.id ? "text-emerald-400" : "text-muted-foreground"
+                  }`} />
                 </div>
-                <div className="text-xs text-muted-foreground/70">{tool.description}</div>
-              </div>
-            </motion.button>
-          ))}
+                <div className="relative min-w-0 flex-1">
+                  <div className={`text-sm font-semibold transition-colors duration-200 flex items-center gap-1.5 ${
+                    activeTool === tool.id ? "text-foreground" : "text-muted-foreground"
+                  }`}>
+                    {tool.label}
+                    {tool.isNew && (
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                        style={{ background: "rgba(16,185,129,0.2)", color: "#4ade80", border: "1px solid rgba(16,185,129,0.3)" }}
+                      >NEW</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground/70 leading-tight mt-0.5">{tool.description}</div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
         </motion.div>
 
         {/* ── Tool Content Panel ── */}
@@ -139,9 +155,18 @@ export default function AcademicHub() {
             className="glass-card rounded-3xl p-6 sm:p-8"
             style={{ boxShadow: "0 2px 0 rgba(255,255,255,0.05) inset, 0 20px 60px rgba(0,0,0,0.25)" }}
           >
-            {activeTool === "study"   && <StudyGuides />}
-            {activeTool === "gpa"     && <GPAConverter />}
-            {activeTool === "tracker" && <UniversityTracker />}
+            {activeTool === "study"     && <StudyGuides />}
+            {activeTool === "gpa"       && <GPAConverter />}
+            {activeTool === "tracker"   && <UniversityTracker />}
+            {activeTool === "citations" && (
+              <Suspense fallback={
+                <div className="flex items-center justify-center py-16">
+                  <div className="w-6 h-6 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin" />
+                </div>
+              }>
+                <CitationGenerator />
+              </Suspense>
+            )}
           </motion.div>
         </AnimatePresence>
 
