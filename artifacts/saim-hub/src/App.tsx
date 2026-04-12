@@ -10,6 +10,7 @@ import { AuthProvider } from "@/context/AuthContext";
 const BlogList   = lazy(() => import("@/pages/BlogList"));
 const BlogPost   = lazy(() => import("@/pages/BlogPost"));
 const AdminPanel = lazy(() => import("@/pages/AdminPanel"));
+const VerifyOtp  = lazy(() => import("@/pages/VerifyOtp"));
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/verify-otp">
+        <Suspense fallback={<PageLoader />}><VerifyOtp /></Suspense>
+      </Route>
       <Route path="/blog">
         <Suspense fallback={<PageLoader />}><BlogList /></Suspense>
       </Route>

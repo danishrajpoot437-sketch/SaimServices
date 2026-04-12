@@ -2,8 +2,13 @@ import express, { type Express, type Request, type Response, type NextFunction }
 import cors from "cors";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { connectMongoDB } from "./lib/mongodb";
 
 const app: Express = express();
+
+connectMongoDB().catch((err) => {
+  logger.error({ err }, "Failed to connect to MongoDB on startup");
+});
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();

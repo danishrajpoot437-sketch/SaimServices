@@ -10,31 +10,31 @@ export interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (name: string, email: string, password: string) => Promise<void>;
+  signUp: (name: string, email: string, password: string) => Promise<{ email: string }>;
+  verifyOtp: (email: string, otp: string) => Promise<void>;
+  resendOtp: (email: string) => Promise<void>;
   signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const USERS_KEY = "saim_users_v1";
 const SESSION_KEY = "saim_session_v1";
 
-function simpleHash(str: string): string {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
+async function apiPost<T>(path: string, body: object): Promise<T> {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const err = new Error(data.error ?? "Something went wrong. Please try again.");
+    (err as Error & { requiresVerification?: boolean; email?: string }).requiresVerification =
+      data.requiresVerification ?? false;
+    (err as Error & { email?: string }).email = data.email;
+    throw err;
   }
-  return (h >>> 0).toString(36);
-}
-
-function getUsers(): Array<AuthUser & { passwordHash: string }> {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY) ?? "[]"); }
-  catch { return []; }
-}
-
-function saveUsers(users: Array<AuthUser & { passwordHash: string }>) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  return data as T;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -45,35 +45,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { return null; }
   });
 
-  const signUp = async (name: string, email: string, password: string) => {
-    const normalEmail = email.toLowerCase().trim();
-    const users = getUsers();
-    if (users.some(u => u.email === normalEmail)) {
-      throw new Error("An account with this email already exists.");
-    }
-    const newUser: AuthUser = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: name.trim(),
-      email: normalEmail,
-      createdAt: Date.now(),
-    };
-    users.push({ ...newUser, passwordHash: simpleHash(normalEmail + password) });
-    saveUsers(users);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(newUser));
-    setUser(newUser);
+  const signUp = async (name: string, email: string, password: string): Promise<{ email: string }> => {
+    const data = await apiPost<{ email: string }>("/api/auth/signup", { name, email, password });
+    return { email: data.email };
   };
 
-  const signIn = async (email: string, password: string) => {
-    const normalEmail = email.toLowerCase().trim();
-    const users = getUsers();
-    const record = users.find(u => u.email === normalEmail);
-    if (!record) throw new Error("No account found with this email address.");
-    if (record.passwordHash !== simpleHash(normalEmail + password)) {
-      throw new Error("Incorrect password. Please try again.");
-    }
-    const { passwordHash: _, ...session } = record;
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    setUser(session);
+  const verifyOtp = async (email: string, otp: string): Promise<void> => {
+    const data = await apiPost<{ user: AuthUser }>("/api/auth/verify-otp", { email, otp });
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+    setUser(data.user);
+  };
+
+  const resendOtp = async (email: string): Promise<void> => {
+    await apiPost("/api/auth/resend-otp", { email });
+  };
+
+  const signIn = async (email: string, password: string): Promise<void> => {
+    const data = await apiPost<{ user: AuthUser }>("/api/auth/signin", { email, password });
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+    setUser(data.user);
   };
 
   const signOut = () => {
@@ -82,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, signIn, signUp, verifyOtp, resendOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "wouter";
 import { X, Mail, Lock, User, Eye, EyeOff, Zap, CheckCircle2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -83,6 +84,7 @@ function FieldInput({ icon, type, placeholder, value, onChange, autoComplete, su
 
 export default function AuthModal({ open, onClose }: AuthModalProps) {
   const { signIn, signUp } = useAuth();
+  const [, navigate] = useLocation();
   const [tab, setTab] = useState<"signin" | "signup">("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -91,12 +93,13 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
   const firstRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
       setName(""); setEmail(""); setPassword("");
-      setError(""); setSuccess(false); setShowPw(false); setLoading(false);
+      setError(""); setSuccess(false); setSuccessMsg(""); setShowPw(false); setLoading(false);
       setTimeout(() => firstRef.current?.focus(), 180);
     }
   }, [open]);
@@ -124,11 +127,30 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     }
     setLoading(true);
     try {
-      if (tab === "signup") await signUp(name, email, password);
-      else await signIn(email, password);
-      setSuccess(true);
-      setTimeout(onClose, 1400);
+      if (tab === "signup") {
+        const { email: confirmedEmail } = await signUp(name, email, password);
+        setSuccess(true);
+        setSuccessMsg("Check your inbox for the verification code!");
+        setTimeout(() => {
+          onClose();
+          navigate(`/verify-otp?email=${encodeURIComponent(confirmedEmail)}`);
+        }, 1400);
+      } else {
+        await signIn(email, password);
+        setSuccess(true);
+        setSuccessMsg("Signed in successfully!");
+        setTimeout(onClose, 1400);
+      }
     } catch (ex: unknown) {
+      if (
+        ex instanceof Error &&
+        (ex as Error & { requiresVerification?: boolean; email?: string }).requiresVerification
+      ) {
+        const unverifiedEmail = (ex as Error & { email?: string }).email ?? email;
+        onClose();
+        navigate(`/verify-otp?email=${encodeURIComponent(unverifiedEmail)}`);
+        return;
+      }
       setError(ex instanceof Error ? ex.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -161,14 +183,11 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             }}
             data-testid="auth-modal"
           >
-            {/* Top shimmer line */}
             <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(67,97,238,0.8), rgba(14,165,233,0.8), rgba(67,97,238,0.8), transparent)" }} />
 
-            {/* Ambient glow orb top-right */}
             <div className="absolute top-0 right-0 w-64 h-64 pointer-events-none"
               style={{ background: "radial-gradient(ellipse 55% 55% at 100% 0%, rgba(67,97,238,0.12) 0%, transparent 70%)" }} />
 
-            {/* Close button */}
             <button
               onClick={onClose}
               className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/8 transition-all"
@@ -178,7 +197,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             </button>
 
             <div className="relative px-8 pt-8 pb-9">
-              {/* Logo + Header */}
               <div className="text-center mb-7">
                 <motion.div
                   className="w-13 h-13 rounded-2xl mx-auto mb-4 flex items-center justify-center"
@@ -194,11 +212,11 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   <Zap className="w-6 h-6 text-primary" />
                 </motion.div>
                 <h2 className="text-xl font-bold text-foreground mb-1.5">
-                  {success ? "You're all set!" : tab === "signin" ? "Welcome back" : "Join SaimServices"}
+                  {success ? (tab === "signup" ? "Almost there!" : "You're all set!") : tab === "signin" ? "Welcome back" : "Join SaimServices"}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-snug">
                   {success
-                    ? "Redirecting you in a moment…"
+                    ? successMsg
                     : tab === "signin"
                     ? "Sign in to access all your tools"
                     : "Join 50K+ engineers, students & researchers"}
@@ -222,11 +240,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                     >
                       <CheckCircle2 className="w-8 h-8 text-emerald-400" />
                     </motion.div>
-                    <p className="text-emerald-400 font-semibold">Successfully {tab === "signin" ? "signed in" : "registered"}!</p>
+                    <p className="text-emerald-400 font-semibold">
+                      {tab === "signup" ? "Redirecting to verification…" : "Successfully signed in!"}
+                    </p>
                   </motion.div>
                 ) : (
                   <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    {/* Tab switcher */}
                     <div
                       className="flex p-1 rounded-2xl mb-6"
                       style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
@@ -249,7 +268,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-3.5">
-                      {/* Name (sign-up only) */}
                       <AnimatePresence initial={false}>
                         {tab === "signup" && (
                           <motion.div
@@ -305,7 +323,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                         {tab === "signup" && <PasswordStrength password={password} />}
                       </div>
 
-                      {/* Error */}
                       <AnimatePresence>
                         {error && (
                           <motion.div
@@ -321,7 +338,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                         )}
                       </AnimatePresence>
 
-                      {/* CTA */}
                       <motion.button
                         type="submit"
                         disabled={loading}
