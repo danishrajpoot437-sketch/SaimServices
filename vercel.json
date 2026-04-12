@@ -1,9 +1,21 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && pnpm --filter @workspace/saim-hub run build",
-  "outputDirectory": "artifacts/saim-hub/dist/public",
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  "builds": [
+    {
+      "src": "artifacts/saim-hub/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/public"
+      }
+    },
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.ts" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
