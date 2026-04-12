@@ -21,17 +21,31 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const SESSION_KEY = "saim_session_v1";
 
 async function apiPost<T>(path: string, body: object): Promise<T> {
-  const res = await fetch(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error("Network error — please check your connection and try again.");
+  }
+
+  let data: Record<string, unknown> = {};
+  try {
+    data = await res.json();
+  } catch {
+    if (!res.ok) {
+      throw new Error(`Server error (${res.status}) — please try again in a moment.`);
+    }
+  }
+
   if (!res.ok) {
-    const err = new Error(data.error ?? "Something went wrong. Please try again.");
+    const err = new Error((data.error as string) ?? "Something went wrong. Please try again.");
     (err as Error & { requiresVerification?: boolean; email?: string }).requiresVerification =
-      data.requiresVerification ?? false;
-    (err as Error & { email?: string }).email = data.email;
+      (data.requiresVerification as boolean) ?? false;
+    (err as Error & { email?: string }).email = data.email as string | undefined;
     throw err;
   }
   return data as T;

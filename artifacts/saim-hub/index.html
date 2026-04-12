@@ -5,29 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
     <meta name="description" content="SaimServices Utility Hub — Professional engineering tools, GPA converters, content analyzers, and scholarship guides for engineers, students and researchers worldwide." />
     <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>SaimServices Utility Hub</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
     <!-- Open Graph / Social SEO -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="SaimServices Utility Hub — Engineering, Academic & Productivity Tools" />
     <meta property="og:description" content="Free professional tools for engineers, students and researchers. Unit converters, GPA calculators, content analyzers, AI-curated news and more." />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80" />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80&fm=webp&auto=format" />
     <meta property="og:site_name" content="SaimServices" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="SaimServices Utility Hub" />
     <meta name="twitter:description" content="Professional engineering, academic and content tools. Free, fast, and beautifully designed." />
-    <!-- Preconnect to image CDN for faster news/article images -->
+
+    <!-- Resource hints for external CDNs -->
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
     <link rel="dns-prefetch" href="https://images.unsplash.com" />
-    <!-- Google Fonts — non-blocking async load for better LCP -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lexend:wght@400;500;600;700;800&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lexend:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lexend:wght@400;500;600;700;800&display=swap" /></noscript>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+
+    <!-- Google Fonts — non-blocking async load (font-display:swap via URL param) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lexend:wght@500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lexend:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lexend:wght@500;600;700;800&display=swap" /></noscript>
   </head>
   <body>
     <div id="root"></div>
+    <!-- type="module" is deferred by spec — does not block rendering -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

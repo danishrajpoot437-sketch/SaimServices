@@ -42,22 +42,33 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    target: "es2020",
+    target: "es2022",
     minify: "esbuild",
     cssCodeSplit: true,
+    cssMinify: true,
     assetsInlineLimit: 4096,
+    reportCompressedSize: false,
     rollupOptions: {
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+      },
       output: {
         manualChunks(id) {
-          if (id.includes("katex"))       return "vendor-katex";
-          if (id.includes("mathjs"))      return "vendor-mathjs";
+          if (id.includes("katex"))         return "vendor-katex";
+          if (id.includes("mathjs"))        return "vendor-mathjs";
           if (id.includes("framer-motion")) return "vendor-framer-motion";
           if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-")) return "vendor-charts";
-          if (id.includes("node_modules")) return "vendor";
+          if (id.includes("lucide-react"))  return "vendor-icons";
+          if (id.includes("node_modules"))  return "vendor";
         },
       },
     },
     chunkSizeWarningLimit: 600,
+  },
+  esbuild: {
+    legalComments: "none",
+    target: "es2022",
   },
   server: {
     port,
