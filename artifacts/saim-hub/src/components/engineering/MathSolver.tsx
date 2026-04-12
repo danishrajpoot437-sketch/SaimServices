@@ -9,7 +9,8 @@ import {
 } from "lucide-react";
 
 /* ─── Shared Types ────────────────────────────────────────────────────────── */
-export interface HistoryEntry { id: string; mode: string; input: string; result: string; ts: number }
+import type { HistoryEntry } from "./types";
+export type { HistoryEntry } from "./types";
 interface MathSolverProps {
   onHistoryPush: (entry: HistoryEntry) => void;
   onStatusChange: (status: "idle" | "computing" | "done" | "error") => void;

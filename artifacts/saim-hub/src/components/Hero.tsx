@@ -32,8 +32,9 @@ export default function Hero() {
   const [discoveryOpen, setDiscoveryOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const discoveryRef = useRef<HTMLDivElement>(null);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const { scrollY } = useScroll();
-  const parallaxY = useTransform(scrollY, [0, 600], [0, -80]);
+  const parallaxY = useTransform(scrollY, [0, 600], isMobile ? [0, 0] : [0, -80]);
 
   useEffect(() => {
     if (!discoveryOpen) return;

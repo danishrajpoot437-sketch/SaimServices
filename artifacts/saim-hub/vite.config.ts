@@ -42,12 +42,17 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    target: "es2020",
+    minify: "esbuild",
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096,
     rollupOptions: {
       output: {
         manualChunks(id) {
+          if (id.includes("katex"))       return "vendor-katex";
+          if (id.includes("mathjs"))      return "vendor-mathjs";
           if (id.includes("framer-motion")) return "vendor-framer-motion";
           if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-")) return "vendor-charts";
-          if (id.includes("mathjs")) return "vendor-mathjs";
           if (id.includes("node_modules")) return "vendor";
         },
       },

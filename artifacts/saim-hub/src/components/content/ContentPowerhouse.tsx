@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Layers, Zap } from "lucide-react";
-import FileConversionEngine from "./FileConversionEngine";
-import ContentAnalyzer from "./ContentAnalyzer";
+
+const FileConversionEngine = lazy(() => import("./FileConversionEngine"));
+const ContentAnalyzer      = lazy(() => import("./ContentAnalyzer"));
 
 type Tool = "converter" | "analyzer";
 
@@ -168,18 +169,24 @@ export default function ContentPowerhouse() {
               </span>
             </div>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTool}
-                initial={{ opacity: 0, y: 14, scale: 0.99 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.99 }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {activeTool === "converter" && <FileConversionEngine />}
-                {activeTool === "analyzer"  && <ContentAnalyzer />}
-              </motion.div>
-            </AnimatePresence>
+            <Suspense fallback={
+              <div className="flex items-center justify-center py-12">
+                <div className="w-7 h-7 rounded-full border-2 border-amber-400/30 border-t-amber-400 animate-spin" />
+              </div>
+            }>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTool}
+                  initial={{ opacity: 0, y: 14, scale: 0.99 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.99 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {activeTool === "converter" && <FileConversionEngine />}
+                  {activeTool === "analyzer"  && <ContentAnalyzer />}
+                </motion.div>
+              </AnimatePresence>
+            </Suspense>
           </div>
         </motion.div>
       </div>

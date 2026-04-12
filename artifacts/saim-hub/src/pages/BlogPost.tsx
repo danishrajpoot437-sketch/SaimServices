@@ -171,7 +171,7 @@ export default function BlogPost() {
             {/* Cover image */}
             {blog.coverImage && (
               <div className="rounded-2xl overflow-hidden mb-8" style={{ maxHeight: 420 }}>
-                <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover" />
+                <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
               </div>
             )}
 

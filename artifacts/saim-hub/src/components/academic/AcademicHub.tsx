@@ -1,13 +1,13 @@
 import { useState, lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, Calculator, Building2, Quote, Search } from "lucide-react";
-import StudyGuides from "./StudyGuides";
-import GPAConverter from "./GPAConverter";
-import UniversityTracker from "./UniversityTracker";
-import ResourceCenter from "./ResourceCenter";
 
-const CitationGenerator = lazy(() => import("./CitationGenerator"));
-const ResearchFinder = lazy(() => import("./ResearchFinder"));
+const StudyGuides        = lazy(() => import("./StudyGuides"));
+const GPAConverter       = lazy(() => import("./GPAConverter"));
+const UniversityTracker  = lazy(() => import("./UniversityTracker"));
+const ResourceCenter     = lazy(() => import("./ResourceCenter"));
+const CitationGenerator  = lazy(() => import("./CitationGenerator"));
+const ResearchFinder     = lazy(() => import("./ResearchFinder"));
 
 type Tool = "study" | "gpa" | "tracker" | "citations" | "research";
 
@@ -177,24 +177,20 @@ export default function AcademicHub() {
             className="glass-card rounded-3xl p-6 sm:p-8"
             style={{ boxShadow: "0 2px 0 rgba(255,255,255,0.05) inset, 0 20px 60px rgba(0,0,0,0.25)" }}
           >
-            {activeTool === "study"     && <StudyGuides />}
-            {activeTool === "gpa"       && <GPAConverter />}
-            {activeTool === "tracker"   && <UniversityTracker />}
-            {activeTool === "citations" && (
-              <Suspense fallback={<LoadingSpinner />}>
-                <CitationGenerator />
-              </Suspense>
-            )}
-            {activeTool === "research" && (
-              <Suspense fallback={<LoadingSpinner />}>
-                <ResearchFinder />
-              </Suspense>
-            )}
+            <Suspense fallback={<LoadingSpinner />}>
+              {activeTool === "study"     && <StudyGuides />}
+              {activeTool === "gpa"       && <GPAConverter />}
+              {activeTool === "tracker"   && <UniversityTracker />}
+              {activeTool === "citations" && <CitationGenerator />}
+              {activeTool === "research"  && <ResearchFinder />}
+            </Suspense>
           </motion.div>
         </AnimatePresence>
 
         {/* ── Official Resource Center (always visible below) ── */}
-        <ResourceCenter />
+        <Suspense fallback={null}>
+          <ResourceCenter />
+        </Suspense>
       </div>
     </section>
   );

@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import { evaluate, parse } from "mathjs";
 import { Plus, Trash2, Download, Play, ZoomIn, ZoomOut } from "lucide-react";
-import type { HistoryEntry } from "./MathSolver";
+import type { HistoryEntry } from "./types";
 
 interface FnEntry {
   id: string;

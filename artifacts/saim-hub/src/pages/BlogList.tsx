@@ -186,6 +186,7 @@ export default function BlogList() {
                       {filtered[0].coverImage ? (
                         <img src={filtered[0].coverImage} alt={filtered[0].title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          loading="lazy" decoding="async"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center"
@@ -265,6 +266,7 @@ export default function BlogList() {
                         {blog.coverImage ? (
                           <img src={blog.coverImage} alt={blog.title}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            loading="lazy" decoding="async"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center"

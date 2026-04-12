@@ -1,20 +1,22 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeftRight, Layers, TrendingUp, Atom,
   Sigma, FlaskConical, Maximize2, Minimize2,
   History, X, Zap, Clock, ChevronRight, BarChart2, Building2, Terminal,
 } from "lucide-react";
-import UnitPro from "./UnitPro";
-import MaterialFinder from "./MaterialFinder";
-import FunctionPlotter from "./FunctionPlotter";
-import EngineeringConstants from "./EngineeringConstants";
-import MathSolver, { type HistoryEntry } from "./MathSolver";
-import GraphLab from "./GraphLab";
-import PeriodicTable from "./PeriodicTable";
-import StatSuite from "./StatSuite";
-import BeamCalculator from "./BeamCalculator";
-import DevKit from "./DevKit";
+import type { HistoryEntry } from "./types";
+
+const UnitPro             = lazy(() => import("./UnitPro"));
+const MaterialFinder      = lazy(() => import("./MaterialFinder"));
+const FunctionPlotter     = lazy(() => import("./FunctionPlotter"));
+const EngineeringConstants = lazy(() => import("./EngineeringConstants"));
+const MathSolver          = lazy(() => import("./MathSolver"));
+const GraphLab            = lazy(() => import("./GraphLab"));
+const PeriodicTable       = lazy(() => import("./PeriodicTable"));
+const StatSuite           = lazy(() => import("./StatSuite"));
+const BeamCalculator      = lazy(() => import("./BeamCalculator"));
+const DevKit              = lazy(() => import("./DevKit"));
 
 type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats" | "beam" | "devkit";
 type EngineStatus = "idle" | "computing" | "done" | "error";
@@ -245,27 +247,33 @@ export default function EngineeringSuite() {
         {/* Main content area */}
         <div className="flex">
           <div className="flex-1 p-5 sm:p-7 min-w-0">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                variants={contentVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {activeTab === "unitpro"    && <UnitPro />}
-                {activeTab === "materials"  && <MaterialFinder />}
-                {activeTab === "plotter"    && <FunctionPlotter />}
-                {activeTab === "constants"  && <EngineeringConstants />}
-                {activeTab === "mathsolver" && <MathSolver onHistoryPush={pushHistory} onStatusChange={handleStatusChange} />}
-                {activeTab === "graphlab"   && <GraphLab  onHistoryPush={pushHistory} onStatusChange={handleStatusChange} />}
-                {activeTab === "periodic"   && <PeriodicTable />}
-                {activeTab === "stats"      && <StatSuite />}
-                {activeTab === "beam"       && <BeamCalculator />}
-                {activeTab === "devkit"     && <DevKit />}
-              </motion.div>
-            </AnimatePresence>
+            <Suspense fallback={
+              <div className="flex items-center justify-center py-16">
+                <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+              </div>
+            }>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  variants={contentVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {activeTab === "unitpro"    && <UnitPro />}
+                  {activeTab === "materials"  && <MaterialFinder />}
+                  {activeTab === "plotter"    && <FunctionPlotter />}
+                  {activeTab === "constants"  && <EngineeringConstants />}
+                  {activeTab === "mathsolver" && <MathSolver onHistoryPush={pushHistory} onStatusChange={handleStatusChange} />}
+                  {activeTab === "graphlab"   && <GraphLab  onHistoryPush={pushHistory} onStatusChange={handleStatusChange} />}
+                  {activeTab === "periodic"   && <PeriodicTable />}
+                  {activeTab === "stats"      && <StatSuite />}
+                  {activeTab === "beam"       && <BeamCalculator />}
+                  {activeTab === "devkit"     && <DevKit />}
+                </motion.div>
+              </AnimatePresence>
+            </Suspense>
           </div>
 
           {/* History Sidebar */}
