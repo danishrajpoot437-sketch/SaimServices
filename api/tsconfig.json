@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "typeRoots": [
+      "../node_modules/@types",
+      "../artifacts/api-server/node_modules/@types"
+    ]
+  },
+  "include": ["index.ts", "../artifacts/api-server/src/**/*", "../lib/**/*"]
+}
