@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "export NODE_ENV=development PORT=8080 && (fuser -k 8080/tcp 2>/dev/null || true) && pnpm run build && pnpm run start",
+    "build:vercel": "node build-vercel.mjs",
     "prebuild": "tsc -p ../../lib/api-zod/tsconfig.json && tsc -p ../../lib/db/tsconfig.json",
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
