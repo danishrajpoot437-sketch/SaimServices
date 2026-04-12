@@ -53,7 +53,10 @@ router.post("/auth/signup", async (req: Request, res: Response) => {
       existing.name = name.trim();
       existing.passwordHash = hashPassword(password, normalEmail);
       await existing.save();
-      await sendOtpEmail(normalEmail, name.trim(), otp);
+      sendOtpEmail(normalEmail, name.trim(), otp).catch((emailErr) => {
+        console.error("OTP email failed to send:", emailErr?.message ?? emailErr);
+        console.info(`[DEV] OTP for ${normalEmail}: ${otp}`);
+      });
       res.json({ message: "OTP resent. Please check your email.", email: normalEmail });
       return;
     }
@@ -68,7 +71,11 @@ router.post("/auth/signup", async (req: Request, res: Response) => {
       otpExpiry: new Date(Date.now() + OTP_TTL_MS),
     });
     await user.save();
-    await sendOtpEmail(normalEmail, name.trim(), otp);
+
+    sendOtpEmail(normalEmail, name.trim(), otp).catch((emailErr) => {
+      console.error("OTP email failed to send:", emailErr?.message ?? emailErr);
+      console.info(`[DEV] OTP for ${normalEmail}: ${otp}`);
+    });
 
     res.status(201).json({
       message: "Account created. Please check your email for the verification code.",
@@ -204,7 +211,10 @@ router.post("/auth/resend-otp", async (req: Request, res: Response) => {
     user.otp = otp;
     user.otpExpiry = new Date(Date.now() + OTP_TTL_MS);
     await user.save();
-    await sendOtpEmail(normalEmail, user.name, otp);
+    sendOtpEmail(normalEmail, user.name, otp).catch((emailErr) => {
+      console.error("Resend OTP email failed:", emailErr?.message ?? emailErr);
+      console.info(`[DEV] Resend OTP for ${normalEmail}: ${otp}`);
+    });
 
     res.json({ message: "A new verification code has been sent to your email." });
   } catch (err) {
