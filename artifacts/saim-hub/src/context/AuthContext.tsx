@@ -10,7 +10,8 @@ export interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (name: string, email: string, password: string) => Promise<{ email: string }>;
+  signUp: (name: string, email: string, password: string) => Promise<{ email: string; skipOtp?: boolean; user?: AuthUser }>;
+  googleSignIn: (credential: string) => Promise<void>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
   resendOtp: (email: string) => Promise<void>;
   signOut: () => void;
@@ -59,9 +60,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { return null; }
   });
 
-  const signUp = async (name: string, email: string, password: string): Promise<{ email: string }> => {
-    const data = await apiPost<{ email: string }>("/api/auth/signup", { name, email, password });
-    return { email: data.email };
+  const signUp = async (name: string, email: string, password: string) => {
+    const data = await apiPost<{ email?: string; skipOtp?: boolean; user?: AuthUser }>(
+      "/api/auth/signup", { name, email, password }
+    );
+    if (data.skipOtp && data.user) {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+      setUser(data.user);
+      return { email: data.user.email, skipOtp: true, user: data.user };
+    }
+    return { email: data.email ?? email };
+  };
+
+  const googleSignIn = async (accessToken: string): Promise<void> => {
+    const data = await apiPost<{ user: AuthUser }>("/api/auth/google-token", { accessToken });
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data.user));
+    setUser(data.user);
   };
 
   const verifyOtp = async (email: string, otp: string): Promise<void> => {
@@ -86,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signUp, verifyOtp, resendOtp, signOut }}>
+    <AuthContext.Provider value={{ user, signIn, signUp, googleSignIn, verifyOtp, resendOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

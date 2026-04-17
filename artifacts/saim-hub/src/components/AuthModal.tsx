@@ -3,11 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { X, Mail, Lock, User, Eye, EyeOff, Zap, CheckCircle2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import GoogleSignInButton from "./GoogleSignInButton";
 
 interface AuthModalProps {
   open: boolean;
   onClose: () => void;
 }
+
+const GOOGLE_ENABLED = !!(import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined);
 
 function PasswordStrength({ password }: { password: string }) {
   const checks = [
@@ -24,9 +27,7 @@ function PasswordStrength({ password }: { password: string }) {
     <div className="mt-2">
       <div className="flex gap-1 mb-1">
         {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-1 flex-1 rounded-full transition-all duration-300"
+          <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300"
             style={{ background: i < score ? colors[score - 1] : "rgba(255,255,255,0.08)" }}
           />
         ))}
@@ -91,6 +92,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -99,7 +101,8 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
   useEffect(() => {
     if (open) {
       setName(""); setEmail(""); setPassword("");
-      setError(""); setSuccess(false); setSuccessMsg(""); setShowPw(false); setLoading(false);
+      setError(""); setSuccess(false); setSuccessMsg("");
+      setShowPw(false); setLoading(false); setGoogleLoading(false);
       setTimeout(() => firstRef.current?.focus(), 180);
     }
   }, [open]);
@@ -128,13 +131,19 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     setLoading(true);
     try {
       if (tab === "signup") {
-        const { email: confirmedEmail } = await signUp(name, email, password);
-        setSuccess(true);
-        setSuccessMsg("Check your inbox for the verification code!");
-        setTimeout(() => {
-          onClose();
-          navigate(`/verify-otp?email=${encodeURIComponent(confirmedEmail)}`);
-        }, 1400);
+        const result = await signUp(name, email, password);
+        if (result.skipOtp) {
+          setSuccess(true);
+          setSuccessMsg(`Welcome, ${result.user?.name ?? name}! Account created!`);
+          setTimeout(onClose, 1400);
+        } else {
+          setSuccess(true);
+          setSuccessMsg("Check your inbox for the verification code!");
+          setTimeout(() => {
+            onClose();
+            navigate(`/verify-otp?email=${encodeURIComponent(result.email)}`);
+          }, 1400);
+        }
       } else {
         await signIn(email, password);
         setSuccess(true);
@@ -168,7 +177,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           className="fixed inset-0 z-[999] flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.70)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-          data-testid="auth-modal-backdrop"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.93, y: 24 }}
@@ -181,17 +189,14 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               border: "1px solid rgba(67,97,238,0.28)",
               boxShadow: "0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03) inset, 0 0 80px rgba(67,97,238,0.07)",
             }}
-            data-testid="auth-modal"
           >
             <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(67,97,238,0.8), rgba(14,165,233,0.8), rgba(67,97,238,0.8), transparent)" }} />
-
             <div className="absolute top-0 right-0 w-64 h-64 pointer-events-none"
               style={{ background: "radial-gradient(ellipse 55% 55% at 100% 0%, rgba(67,97,238,0.12) 0%, transparent 70%)" }} />
 
             <button
               onClick={onClose}
               className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-white/8 transition-all"
-              data-testid="auth-modal-close"
             >
               <X className="w-4 h-4" />
             </button>
@@ -199,11 +204,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             <div className="relative px-8 pt-8 pb-9">
               <div className="text-center mb-7">
                 <motion.div
-                  className="w-13 h-13 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                  className="mx-auto mb-4 flex items-center justify-center"
                   style={{
                     width: 52, height: 52,
                     background: "linear-gradient(135deg, rgba(67,97,238,0.25) 0%, rgba(14,165,233,0.15) 100%)",
                     border: "1px solid rgba(67,97,238,0.35)",
+                    borderRadius: 16,
                     boxShadow: "0 0 28px rgba(67,97,238,0.3)",
                   }}
                   animate={{ boxShadow: ["0 0 20px rgba(67,97,238,0.2)", "0 0 36px rgba(67,97,238,0.4)", "0 0 20px rgba(67,97,238,0.2)"] }}
@@ -212,12 +218,10 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                   <Zap className="w-6 h-6 text-primary" />
                 </motion.div>
                 <h2 className="text-xl font-bold text-foreground mb-1.5">
-                  {success ? (tab === "signup" ? "Almost there!" : "You're all set!") : tab === "signin" ? "Welcome back" : "Join SaimServices"}
+                  {success ? "You're all set!" : tab === "signin" ? "Welcome back" : "Join SaimServices"}
                 </h2>
                 <p className="text-sm text-muted-foreground leading-snug">
-                  {success
-                    ? successMsg
-                    : tab === "signin"
+                  {success ? successMsg : tab === "signin"
                     ? "Sign in to access all your tools"
                     : "Join 50K+ engineers, students & researchers"}
                 </p>
@@ -240,14 +244,12 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                     >
                       <CheckCircle2 className="w-8 h-8 text-emerald-400" />
                     </motion.div>
-                    <p className="text-emerald-400 font-semibold">
-                      {tab === "signup" ? "Redirecting to verification…" : "Successfully signed in!"}
-                    </p>
+                    <p className="text-emerald-400 font-semibold text-center">{successMsg}</p>
                   </motion.div>
                 ) : (
                   <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div
-                      className="flex p-1 rounded-2xl mb-6"
+                      className="flex p-1 rounded-2xl mb-5"
                       style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
                     >
                       {(["signin", "signup"] as const).map((t) => (
@@ -260,12 +262,35 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                             background: tab === t ? "rgba(67,97,238,0.9)" : "transparent",
                             boxShadow: tab === t ? "0 4px 14px rgba(67,97,238,0.4)" : "none",
                           }}
-                          data-testid={`auth-tab-${t}`}
                         >
                           {t === "signin" ? "Sign In" : "Sign Up"}
                         </button>
                       ))}
                     </div>
+
+                    {/* Google Sign-In — only when VITE_GOOGLE_CLIENT_ID is set */}
+                    {GOOGLE_ENABLED && (
+                      <>
+                        <div className="mb-4">
+                          <GoogleSignInButton
+                            loading={googleLoading}
+                            disabled={loading}
+                            onLoadingChange={setGoogleLoading}
+                            onSuccess={() => {
+                              setSuccess(true);
+                              setSuccessMsg("Signed in with Google!");
+                              setTimeout(onClose, 1400);
+                            }}
+                            onError={(msg) => setError(msg)}
+                          />
+                        </div>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+                          <span className="text-xs text-muted-foreground/50 font-medium">or</span>
+                          <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+                        </div>
+                      </>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-3.5">
                       <AnimatePresence initial={false}>
@@ -340,7 +365,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
 
                       <motion.button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || googleLoading}
                         whileHover={{ scale: loading ? 1 : 1.01 }}
                         whileTap={{ scale: loading ? 1 : 0.98 }}
                         className="w-full py-3.5 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2 mt-1"
@@ -350,7 +375,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                           opacity: loading ? 0.72 : 1,
                           cursor: loading ? "not-allowed" : "pointer",
                         }}
-                        data-testid={`auth-submit-${tab}`}
                       >
                         {loading ? (
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -358,7 +382,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                       </motion.button>
                     </form>
 
-                    <p className="text-center text-xs text-muted-foreground mt-6">
+                    <p className="text-center text-xs text-muted-foreground mt-5">
                       {tab === "signin" ? "New here?" : "Already have an account?"}{" "}
                       <button
                         onClick={() => setTab(tab === "signin" ? "signup" : "signin")}
