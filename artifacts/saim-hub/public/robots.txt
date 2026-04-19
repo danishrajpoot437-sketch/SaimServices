@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /verify-otp
+
+Sitemap: https://saimservices.replit.app/sitemap.xml

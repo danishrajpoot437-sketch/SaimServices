@@ -1,0 +1,69 @@
+MOBILE-FIRST OPTIMIZATION (TOP PRIORITY)
+Make the entire design mobile-first (not desktop-first)
+Fix all responsiveness issues (no overflow, no broken layout)
+Ensure all buttons are easily clickable on small screens
+Improve font sizes, spacing, and readability on mobile
+Optimize navigation for mobile (clean, simple, fast)
+Reduce unnecessary animations on mobile if they affect performance
+PERFORMANCE OPTIMIZATION (CRITICAL)
+Reduce page load time as much as possible
+Optimize all images:
+convert to WebP or AVIF
+compress without quality loss
+implement lazy loading
+Minify and optimize:
+CSS
+JavaScript
+Remove unused CSS and JS
+Use code splitting and dynamic imports
+Reduce bundle size
+Improve Core Web Vitals:
+Largest Contentful Paint (LCP)
+First Input Delay (FID) / Interaction to Next Paint (INP)
+Cumulative Layout Shift (CLS)
+Avoid layout shifts (reserve space for images and elements)
+TECHNICAL SEO
+Add proper meta tags (title, description) for all pages
+Add Open Graph and Twitter meta tags
+Fix heading structure (one H1, proper H2/H3 hierarchy)
+Add alt text to all images
+Generate sitemap.xml
+Generate robots.txt
+Ensure clean URLs
+CONTENT SEO
+Improve homepage text with clear keywords:
+“engineering tools”
+“online calculators”
+“unit converter”
+Make content clear, not generic
+Add internal linking between pages/tools
+STRUCTURED DATA (ADVANCED SEO)
+Add schema markup (JSON-LD):
+WebSite
+Organization
+Breadcrumbs
+USER EXPERIENCE (SEO BOOST)
+Add fast-loading UI (no blank screens)
+Add loading indicators
+Add empty states (no results messages)
+Improve overall usability
+REMOVE PERFORMANCE ISSUES
+Remove heavy or unused libraries
+Replace inefficient code with optimized alternatives
+Avoid blocking scripts
+FINAL VALIDATION
+Ensure high scores in:
+Google Lighthouse (90+ mobile)
+PageSpeed Insights
+
+IMPORTANT:
+
+Do not just explain — apply all optimizations directly
+Focus on real performance gains, not theory
+Prioritize mobile performance over desktop
+Keep the design clean but lightweight
+
+At the end:
+
+List all improvements made
+Confirm performance and SEO improvements

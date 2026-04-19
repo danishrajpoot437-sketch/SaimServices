@@ -113,15 +113,15 @@ export default function ToolCard({ id, name, category, description, icon, sectio
           <button
             onClick={handleFav}
             onKeyDown={handleFavKey}
-            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+            className={`min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center transition-all ${
               fav ? "text-amber-400 bg-amber-400/10 hover:bg-amber-400/20"
-                  : "text-muted-foreground/40 hover:text-amber-400 hover:bg-amber-400/8 opacity-0 group-hover:opacity-100"
+                  : "text-muted-foreground/40 hover:text-amber-400 hover:bg-amber-400/8 sm:opacity-0 sm:group-hover:opacity-100"
             }`}
             title={fav ? "Remove from favorites" : "Add to favorites"}
             aria-label={fav ? "Remove from favorites" : "Add to favorites"}
             data-testid={`fav-btn-${id}`}
           >
-            <Star className={`w-3.5 h-3.5 ${fav ? "fill-amber-400" : ""}`} />
+            <Star className={`w-4 h-4 ${fav ? "fill-amber-400" : ""}`} />
           </button>
           <motion.div
             className="w-6 h-6 flex items-center justify-center"

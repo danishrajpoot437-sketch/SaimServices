@@ -79,7 +79,7 @@ export default function Hero() {
   };
 
   const stats = [
-    { label: "Engineering Tools", value: "16+", color: "#4361ee" },
+    { label: "Engineering Tools", value: "17",  color: "#4361ee" },
     { label: "Academic Tools",    value: "5",   color: "#0ea5e9" },
     { label: "Content Utilities", value: "4",   color: "#8b5cf6" },
     { label: "Always Free",       value: "100%", color: "#f59e0b" },

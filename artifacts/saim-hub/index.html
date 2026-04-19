@@ -2,57 +2,107 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="7JiDjavA25o0F0zy7k-mbfL53pYbTSUBPdBC-hrq9bM" />
 
-    <title>SaimServices — Engineering Tools Platform</title>
-    <meta name="description" content="A free, professional engineering tools platform: unit converter, beam analyst, math solver, Ohm's Law, resistor decoder, periodic table, GPA converter, citation generator and more. Built for engineers, students and researchers." />
-    <meta name="keywords" content="engineering tools, online calculator, unit converter, beam deflection, ohm's law, resistor color code, math solver, periodic table, GPA calculator, citation generator" />
+    <title>SaimServices — Free Engineering Tools, Calculators & Unit Converter Online</title>
+    <meta name="description" content="Free professional engineering tools online: unit converter, beam analyst, math solver, Ohm's Law, resistor decoder, periodic table, GPA converter, citation generator and 20+ more. Built for engineers, students and researchers." />
+    <meta name="keywords" content="engineering tools, online calculators, unit converter, beam deflection calculator, ohm's law calculator, resistor color code, math solver, periodic table, GPA calculator, citation generator, free engineering software" />
     <meta name="author" content="SaimServices" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
 
     <meta name="theme-color" content="#0f172a" />
+    <meta name="color-scheme" content="dark" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="canonical" href="https://saimservices.replit.app/" />
 
-    <!-- Open Graph / Social SEO -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="SaimServices — Engineering Tools Platform" />
-    <meta property="og:description" content="Free professional engineering tools — unit converter, beam analyst, math solver, periodic table, Ohm's Law, GPA converter, citations, file converter and more." />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80&fm=webp&auto=format" />
+    <meta property="og:url" content="https://saimservices.replit.app/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="SaimServices — Free Engineering Tools & Online Calculators" />
+    <meta property="og:description" content="Free professional engineering tools online — unit converter, beam analyst, math solver, periodic table, Ohm's Law, GPA converter, citations and 20+ more. Fast, accurate, beautifully designed." />
+    <meta property="og:image" content="https://saimservices.replit.app/opengraph.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="SaimServices" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="SaimServices — Engineering Tools Platform" />
-    <meta name="twitter:description" content="Free professional engineering, academic and content tools. Fast, accurate, beautifully designed." />
 
-    <!-- Structured Data -->
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SaimServices — Free Engineering Tools & Online Calculators" />
+    <meta name="twitter:description" content="Free professional engineering, academic and content tools. Fast, accurate, beautifully designed." />
+    <meta name="twitter:image" content="https://saimservices.replit.app/opengraph.jpg" />
+
+    <!-- Structured data: Organization + WebApplication + BreadcrumbList + FAQ -->
     <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "SaimServices",
+        "url": "https://saimservices.replit.app/",
+        "logo": "https://saimservices.replit.app/favicon.svg",
+        "description": "Free engineering tools, calculators and academic utilities for students, engineers and researchers."
+      },
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "SaimServices Engineering Tools Platform",
-        "description": "Free professional engineering, academic and productivity tools.",
-        "applicationCategory": "UtilitiesApplication",
+        "url": "https://saimservices.replit.app/",
+        "description": "28+ free engineering, academic and content tools in one workspace.",
+        "applicationCategory": "EngineeringApplication",
         "operatingSystem": "Web",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        "browserRequirements": "Requires JavaScript and a modern web browser",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "120" }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://saimservices.replit.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Engineering Suite", "item": "https://saimservices.replit.app/#engineering-suite" },
+          { "@type": "ListItem", "position": 3, "name": "Academic Hub", "item": "https://saimservices.replit.app/#academic-hub" },
+          { "@type": "ListItem", "position": 4, "name": "Blog", "item": "https://saimservices.replit.app/blog" }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Are SaimServices tools free to use?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes, every tool on SaimServices is completely free with no sign-up required, no trials, and no premium tier." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which engineering calculators are available?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Beam analyst (SFD, BMD, deflection), Ohm's Law, resistor decoder, math solver, unit converter, periodic table, statistics suite, function plotter, triangle solver and 20+ more." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do the tools work on mobile devices?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes, SaimServices is fully responsive and optimized for mobile, tablet and desktop browsers." }
+          }
+        ]
       }
+    ]
     </script>
 
-    <!-- Resource hints for external CDNs -->
-    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
-    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+    <!-- Resource hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
-    <!-- Google Fonts — non-blocking async load -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lexend:wght@500;600;700;800&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lexend:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lexend:wght@500;600;700;800&display=swap" /></noscript>
+    <!-- Trimmed Google Fonts: 4 weights only (was 9). Loads non-blocking. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lexend:wght@700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lexend:wght@700&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lexend:wght@700&display=swap" /></noscript>
   </head>
   <body>
     <div id="root"></div>

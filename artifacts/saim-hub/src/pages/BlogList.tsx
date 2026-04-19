@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
@@ -66,6 +66,12 @@ function formatDate(iso: string | null) {
 export default function BlogList() {
   const [search,   setSearch]   = useState("");
   const [category, setCategory] = useState("All");
+
+  useEffect(() => {
+    const prev = document.title;
+    document.title = "Blog — Engineering Insights & Tutorials | SaimServices";
+    return () => { document.title = prev; };
+  }, []);
 
   const { data: blogs = [], isLoading, error } = useQuery<Blog[]>({
     queryKey: ["blogs"],

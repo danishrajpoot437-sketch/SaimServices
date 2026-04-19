@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { motion } from "framer-motion";
@@ -65,6 +66,38 @@ export default function BlogPost() {
   });
 
   const catColor = blog ? (CATEGORY_COLORS[blog.category.toLowerCase()] ?? CATEGORY_COLORS.general) : "";
+
+  useEffect(() => {
+    if (!blog) return;
+    const prevTitle = document.title;
+    document.title = `${blog.title} — SaimServices Blog`;
+
+    const previousValues: Array<{ el: HTMLMetaElement; prev: string | null; created: boolean }> = [];
+    const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
+      let el = document.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+      const created = !el;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      previousValues.push({ el, prev: created ? null : el.content, created });
+      el.content = content;
+    };
+    setMeta("description", blog.excerpt);
+    setMeta("og:title", blog.title, "property");
+    setMeta("og:description", blog.excerpt, "property");
+    setMeta("og:type", "article", "property");
+    if (blog.coverImage) setMeta("og:image", blog.coverImage, "property");
+
+    return () => {
+      document.title = prevTitle;
+      for (const { el, prev, created } of previousValues) {
+        if (created) el.remove();
+        else if (prev !== null) el.content = prev;
+      }
+    };
+  }, [blog]);
 
   const handleShare = () => {
     if (navigator.share && blog) {
