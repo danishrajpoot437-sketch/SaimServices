@@ -1,0 +1,76 @@
+You built this website for me. Now I want you to fully fix, improve, and finalize it into a professional, production-ready project.
+
+Do NOT just explain — actually update and improve the project step-by-step.
+
+First, clean and fix the project:
+
+* remove unused code and unnecessary dependencies
+* fix folder structure (components, pages/app, utils, services)
+* fix bugs, broken logic, and messy code
+* make the code clean, scalable, and organized
+
+Then improve the core purpose:
+
+* make the website clearly an “Engineering Tools Platform”
+* update homepage text so users instantly understand what it does
+* remove confusing or generic content
+
+Then improve UI/UX:
+
+* fix layout, spacing, and alignment
+* improve hero section and navigation
+* make design more clean and professional
+* ensure mobile responsiveness
+* add loading states (skeletons/loaders)
+* add empty states (no results messages)
+
+Then improve features:
+
+* make sure all existing tools work correctly
+* improve tool UI (inputs/outputs clarity)
+* add at least 5 new simple tools (converters or calculators)
+* make tools modular so more can be added easily
+
+Then improve user system:
+
+* fix authentication (email/OTP or Google if stable)
+* add real user value:
+
+  * save history
+  * recently used tools
+  * favorites/bookmarks
+
+Then optimize performance:
+
+* optimize images (use WebP if possible)
+* clean and minify CSS/JS
+* enable lazy loading
+* improve loading speed
+
+Then add important production features:
+
+* proper meta tags (SEO)
+* correct heading structure (H1, H2)
+* 404 page
+* error handling and fallback UI
+* input validation and basic security (rate limiting)
+
+Then add analytics:
+
+* integrate Google Analytics or similar tracking
+
+Then prepare for Vercel deployment (VERY IMPORTANT):
+
+* ensure the project builds correctly
+* fix environment variables (.env)
+* make sure nothing breaks on deployment
+* convert backend to serverless functions if needed
+
+Finally:
+
+* confirm the project is fully working
+* confirm it is production-ready
+* confirm it is optimized and clean
+* give me step-by-step instructions to deploy it on Vercel
+
+Be practical and make real improvements, not just suggestions. If something is poorly built, refactor or rebuild it properly.
