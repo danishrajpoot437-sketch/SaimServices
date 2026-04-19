@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Variants } from "framer-motion";
+import { SearchX } from "lucide-react";
 import { toolsData } from "@/data/toolsData";
 import ToolCard from "./ToolCard";
 
@@ -102,17 +103,39 @@ export default function ToolsOverview() {
 
         {/* Tools Grid */}
         <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
-          >
-            {filtered.map((tool, i) => (
-              <ToolCard key={tool.id} {...tool} index={i} />
-            ))}
-          </motion.div>
+          {filtered.length === 0 ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center py-20 px-6 rounded-3xl border border-dashed border-white/10"
+            >
+              <SearchX className="w-12 h-12 text-muted-foreground/30 mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-1.5">No tools in this category</h3>
+              <p className="text-sm text-muted-foreground mb-4 text-center max-w-sm">
+                We don't have any {activeCategory} tools yet. Try another category to see what's available.
+              </p>
+              <button
+                onClick={() => setActiveCategory("All")}
+                className="px-4 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary text-xs font-semibold hover:bg-primary/25 transition-colors"
+              >
+                Show all tools
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={activeCategory}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+            >
+              {filtered.map((tool, i) => (
+                <ToolCard key={tool.id} {...tool} index={i} />
+              ))}
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </section>

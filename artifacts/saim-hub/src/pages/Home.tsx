@@ -5,6 +5,7 @@ import FeatureHighlights from "@/components/FeatureHighlights";
 import ToolsOverview from "@/components/ToolsOverview";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
+import UserHub from "@/components/UserHub";
 
 const EngineeringSuite  = lazy(() => import("@/components/engineering/EngineeringSuite"));
 const AcademicHub       = lazy(() => import("@/components/academic/AcademicHub"));
@@ -56,6 +57,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
+        <UserHub />
         <FeatureHighlights />
         <ToolsOverview />
         <Suspense fallback={<SectionSkeleton />}>

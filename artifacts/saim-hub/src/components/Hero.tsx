@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { Search, ArrowRight, Calculator, BookOpen, FileText, ChevronDown, Sparkles, CheckCircle2, X as XClose } from "lucide-react";
+import { Search, ArrowRight, Calculator, BookOpen, FileText, ChevronDown, Sparkles, CheckCircle2, X as XClose, SearchX } from "lucide-react";
 import { toolsData } from "@/data/toolsData";
+import { useUserData } from "@/context/UserDataContext";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -26,6 +27,7 @@ const DISCOVERY_ITEMS = [
 ];
 
 export default function Hero() {
+  const { trackUse } = useUserData();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<typeof toolsData>([]);
   const [focused, setFocused] = useState(false);
@@ -63,18 +65,24 @@ export default function Hero() {
     }
   }, [query]);
 
-  const handleToolClick = (sectionId: string) => {
+  const handleToolClick = (toolId: string, sectionId: string, tab?: string) => {
+    trackUse(toolId);
     const el = document.getElementById(sectionId);
     if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (tab) {
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("saim-section-tab", { detail: { section: sectionId, tab } }));
+      }, 200);
+    }
     setQuery("");
     setFocused(false);
   };
 
   const stats = [
-    { label: "Tools Available", value: "20+", color: "#4361ee" },
-    { label: "Engineering Tools", value: "10", color: "#0ea5e9" },
-    { label: "Academic Tools", value: "5", color: "#8b5cf6" },
-    { label: "Users Worldwide", value: "50K+", color: "#f59e0b" },
+    { label: "Engineering Tools", value: "16+", color: "#4361ee" },
+    { label: "Academic Tools",    value: "5",   color: "#0ea5e9" },
+    { label: "Content Utilities", value: "4",   color: "#8b5cf6" },
+    { label: "Always Free",       value: "100%", color: "#f59e0b" },
   ];
 
   return (
@@ -194,7 +202,7 @@ export default function Hero() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
               </span>
-              Professional Utility Platform
+              Engineering Tools Platform
             </div>
           </motion.div>
 
@@ -203,11 +211,10 @@ export default function Hero() {
             variants={itemVariants}
             className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-6 font-display leading-[1.08]"
           >
-            <span className="text-foreground">Empowering Global</span>
+            <span className="text-foreground">Every</span>{" "}
+            <span className="shimmer-text">Engineering Tool</span>
             <br />
-            <span className="shimmer-text">Minds with</span>
-            <br />
-            <span className="text-foreground">Precision Tools</span>
+            <span className="text-foreground">You'll Ever Need</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -215,9 +222,9 @@ export default function Hero() {
             variants={itemVariants}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed"
           >
-            The professional ecosystem for engineers, students, and researchers.{" "}
+            Beam analysis, math solver, unit converter, Ohm's Law, periodic table, citations,{" "}
             <br className="hidden sm:block" />
-            Built for those who demand precision, speed, and elegance.
+            and 20+ more — free, fast, and built for serious work.
           </motion.p>
 
           {/* Search Bar */}
@@ -270,6 +277,24 @@ export default function Hero() {
 
             {/* Search Results Dropdown */}
             <AnimatePresence>
+              {focused && query.trim() && results.length === 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  className="absolute top-full mt-2 left-0 right-0 rounded-2xl border overflow-hidden z-50 px-6 py-8 text-center"
+                  style={{
+                    background: "rgba(18, 28, 58, 0.98)",
+                    backdropFilter: "blur(24px)",
+                    borderColor: "rgba(255,255,255,0.08)",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  <SearchX className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
+                  <p className="text-sm font-semibold text-foreground mb-1">No tools match "{query}"</p>
+                  <p className="text-xs text-muted-foreground">Try "calculator", "beam", "GPA", or "convert"</p>
+                </motion.div>
+              )}
               {results.length > 0 && focused && (
                 <motion.div
                   initial={{ opacity: 0, y: 6, scale: 0.98 }}
@@ -290,7 +315,7 @@ export default function Hero() {
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04, duration: 0.2 }}
-                      onClick={() => handleToolClick(tool.sectionId)}
+                      onClick={() => handleToolClick(tool.id, tool.sectionId, tool.tab)}
                       className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-white/5 transition-colors text-left border-b border-white/4 last:border-0 group"
                       data-testid={`search-result-${tool.id}`}
                     >

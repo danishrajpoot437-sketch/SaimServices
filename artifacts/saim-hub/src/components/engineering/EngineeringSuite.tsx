@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeftRight, Layers, TrendingUp, Atom,
   Sigma, FlaskConical, Maximize2, Minimize2,
-  History, X, Zap, Clock, ChevronRight, BarChart2, Building2, Terminal,
+  History, X, Zap, Clock, ChevronRight, BarChart2, Building2, Terminal, Wrench,
 } from "lucide-react";
 import type { HistoryEntry } from "./types";
 
@@ -17,8 +17,9 @@ const PeriodicTable       = lazy(() => import("./PeriodicTable"));
 const StatSuite           = lazy(() => import("./StatSuite"));
 const BeamCalculator      = lazy(() => import("./BeamCalculator"));
 const DevKit              = lazy(() => import("./DevKit"));
+const QuickTools          = lazy(() => import("./QuickTools"));
 
-type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats" | "beam" | "devkit";
+type Tab = "unitpro" | "materials" | "plotter" | "constants" | "mathsolver" | "graphlab" | "periodic" | "stats" | "beam" | "devkit" | "quicktools";
 type EngineStatus = "idle" | "computing" | "done" | "error";
 
 const HISTORY_KEY = "saimservices_eng_history";
@@ -42,6 +43,7 @@ const tabs: {
   { id: "stats",       label: "Stat Suite",    icon: BarChart2,      description: "Descriptive · Regression", badge: "NEW", isNew: true, color: "rgba(139,92,246,1)" },
   { id: "beam",        label: "Beam Analyst",  icon: Building2,      description: "SFD · BMD · Deflection",   badge: "PRO", isNew: true, color: "rgba(16,185,129,1)"  },
   { id: "devkit",      label: "Dev Kit",       icon: Terminal,       description: "JSON · Hash · Regex · Color", badge: "HOT", isNew: true, color: "rgba(251,146,60,1)"  },
+  { id: "quicktools",  label: "Quick Tools",   icon: Wrench,         description: "Ohm's Law · Resistor · Triangle · % · Color · Date", badge: "NEW", isNew: true, color: "rgba(236,72,153,1)" },
 ];
 
 const contentVariants = {
@@ -271,6 +273,7 @@ export default function EngineeringSuite() {
                   {activeTab === "stats"      && <StatSuite />}
                   {activeTab === "beam"       && <BeamCalculator />}
                   {activeTab === "devkit"     && <DevKit />}
+                  {activeTab === "quicktools" && <QuickTools />}
                 </motion.div>
               </AnimatePresence>
             </Suspense>
@@ -423,9 +426,9 @@ export default function EngineeringSuite() {
             </div>
           </div>
           <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            9 professional tools in one workspace — structural beam analysis (SFD · BMD · deflection),
-            symbolic math, multi-function graphing, the full periodic table, statistical analysis,
-            unit conversion, materials, function plotting, and engineering constants.
+            11 professional tools in one workspace — beam analysis, symbolic math, multi-function graphing,
+            the full periodic table, statistics, unit conversion, materials, plotter, engineering constants,
+            dev kit, and quick utilities (Ohm's Law, resistor decoder, triangle solver and more).
           </p>
           <div className="section-divider w-48 mt-5 mx-auto" />
         </motion.div>

@@ -6,6 +6,8 @@ import { lazy, Suspense } from "react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import { AuthProvider } from "@/context/AuthContext";
+import { UserDataProvider } from "@/context/UserDataContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const BlogList   = lazy(() => import("@/pages/BlogList"));
 const BlogPost   = lazy(() => import("@/pages/BlogPost"));
@@ -46,14 +48,18 @@ function Router() {
 function App() {
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
+      <UserDataProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <ErrorBoundary>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Router />
+              </WouterRouter>
+            </ErrorBoundary>
+            <Toaster />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </UserDataProvider>
     </AuthProvider>
   );
 }
